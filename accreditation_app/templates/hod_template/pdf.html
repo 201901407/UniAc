@@ -1,0 +1,61 @@
+
+<html><head>
+    <style>
+        * {
+            font-size: 10px;
+        }
+
+        table {
+            display: table;
+            table-layout: fixed;
+            width: 100%;
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        table th {
+            display: table-cell;
+            white-space: nowrap;
+            overflow: hidden;
+            text-align: left;
+            padding: auto;
+            
+            
+        }
+
+        table td {
+            display: table-cell;
+            white-space: nowrap;
+            overflow: hidden;
+            padding: 3px;
+            
+        }
+    </style>
+</head>
+    
+                
+                
+                        <table>
+                            <thead>
+                            <tr>
+                                {% for item in record %}
+                                {% if forloop.first %}
+                                    {% for h in item %}
+                                        <th>{{ h }}</th>
+                                    {% endfor %}
+                                {% endif%}
+                            {% endfor %}
+                            </tr> 
+                            </thead> 
+                            
+                            {% for row in record %}
+                            <tr>
+                                {% for key,value in row.items%}
+                                <td>{{value}}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    
+                
+</html>

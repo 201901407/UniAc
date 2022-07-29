@@ -1,0 +1,55 @@
+{% load static %}
+
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- Brand Logo -->
+      
+
+
+      <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+          <div class="image">
+            <img src="{% static 'dist/img/logo.png' %}" class="img-circle elevation-2 ml-5" alt="User Image" style="max-width:100%;">
+          </div>
+          <div class="info">
+            <a href="#" class="d-block">{{ user.first_name }} {{ user.last_name }}</a>
+          </div>
+        </div>
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <!-- Add icons to the links using the .nav-icon class
+                with font-awesome or any other icon font library -->
+            
+            <li class="nav-item">
+              {% url 'student_home' as student_home %}
+              <a href="{{ student_home }}" class="nav-link {% if request.path == student_home %} active {% endif %}">
+                <i class="nav-icon fas fa-tachometer-alt"></i>
+                <p>
+                  Home
+                  {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
+                </p>
+              </a>
+            </li>
+
+            
+
+            
+
+            <li class="nav-item">
+              {% url 'grad_student_fill_accreditation' as grad_student_fill_accreditation %}
+              <a href="{{ grad_student_fill_accreditation }}" class="nav-link {% if request.path == grad_student_fill_accreditation %} active {% endif %}">
+                <i class="nav-icon fas fa-tasks"></i>
+                <p>
+                  Fill TAship Details
+                  {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
+                </p>
+              </a>
+            </li>
+
+          </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+      </div>
+      <!-- /.sidebar -->
+    </aside>

@@ -1,0 +1,102 @@
+{% extends 'student_template/base_template.html' %}
+
+{% block page_title %}
+    Fill NAAC Details for TAship
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Fill all required details needed for NAAC accreditation</h3>
+                </div>
+                <!-- /.card-header -->
+
+                            {% comment %} Display Messages {% endcomment %}
+                            {% if messages %}
+                            <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                {% if message.tags == "error" %}
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                {% elif message.tags == "success" %}
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            </div>
+                            {% endif %}
+                        
+                <form method="POST" action="{% url 'grad_student_fill_acc_save' %}">
+                    {% csrf_token %}
+                    <div class="card-body">
+                       
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" name="name" class="form-control" value={{ stud_obj.name }}></div>
+                        <div class="form-group">
+                            <label>Guide</label>
+                            <select name="guide" class="form-control">
+                                <option value="" selected disabled hidden>{{ stud_obj.guide.name }}</option>
+                                {% for row in all_faculty %}
+                                <option value={{ row.id }}>{{ row.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Specialisation/Area of Work</label>
+                            <input type="text" name="spec" class="form-control" value={{ stud_obj.area_of_work }}>
+                        </div>
+                        <div class="form-group">
+                            <label>Year of Registration</label>
+                            <input type="number" name="yor" class="form-control" value={{ stud_obj.year_of_registration }}>
+                        </div>
+                        <div class="form-group">
+                            <label>Please select valid option:</label><br>
+                            {% if stud_obj.type == "Graduate TA" %}
+                            <input type="radio" name = "sel" value="Graduate TA" checked>
+                            {% else %}
+                            <input type="radio" name = "sel" value="Graduate TA">
+                            {% endif %}
+                            <label for="Graduate TA">Graduate TA</label><br>
+                            {% if stud_obj.type == "Doctoral TA" %}
+                            <input type="radio" name = "sel" value="Doctoral TA" checked>
+                            {% else %}
+                            <input type="radio" name = "sel" value="Doctoral TA">
+                            {% endif %}
+                            <label for="Doctoral TA">Doctoral TA</label>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+
+                    <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+
+                </form>
+
+                </div>
+                <!-- /.card -->
+
+
+
+            </div>
+        </div>
+{% endblock main_content %}

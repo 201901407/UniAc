@@ -1,0 +1,121 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Fill Research Project Details
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Fill all required details for Research Project</h3>
+                </div>
+                <!-- /.card-header -->
+
+                            {% comment %} Display Messages {% endcomment %}
+                            {% if messages %}
+                            <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                {% if message.tags == "error" %}
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                {% elif message.tags == "success" %}
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            </div>
+                            {% endif %}
+                        
+                <form method="POST" action="{% url 'res_proj_details_save' %}">
+                    {% csrf_token %}
+                    <div class="card-body">
+                       
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" name="title" class="form-control"></div>
+                        <div class="form-group">
+                            <label>Sponsoring Authority</label>
+                            <input type="text" name="sa" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Cost</label>
+                            <input type="number" name="cost" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Year of Completion</label>
+                            <input type="number" name="yc" class="form-control">
+                        </div>
+                        
+                    </div>
+                    <!-- /.card-body -->
+
+                    <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button> <a class="btn btn-primary" href="{% url 'res_print_form' %}" role="button">Print Report</a><br/>&nbsp;
+                    </div>
+
+                </form>
+
+                </div>
+                <!-- /.card -->
+
+
+
+            </div>
+        </div>
+        <div class="row">
+			<div class="col-md-12">
+				<div class="card card-success">
+					<div class="card-header">
+						<h3 class="card-title">Recent Research Projects</h3>
+					</div>
+					
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table">
+								<thead class="thead-light">
+								<tr>
+									<th>Sr. no.</th>
+									<th>Title</th>
+									<th>Sponsoring Authority</th>
+                                    <th>Cost</th>
+                                    <th>Year of Completion</th>
+								</tr>
+								</thead>
+								
+								{% for row in research_area %}
+								<tr>
+									<td>{{ row.id }}</td>
+									<td>{{ row.title }}</td>
+									<td>{{ row.spron_auth }}</td>
+                                    <td>{{ row.cost }}</td>
+                                    <td>{{ row.year_completed }}</td>
+								</tr>
+								{% endfor %}
+							</table>
+						</div>
+					</div>
+					<!-- /.card-body -->
+				</div>
+			</div>
+		</div>
+	
+	</div><!-- /.container-fluid -->
+{% endblock main_content %}

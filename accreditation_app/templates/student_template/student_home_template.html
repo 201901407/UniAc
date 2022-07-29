@@ -1,0 +1,15 @@
+{% extends 'student_template/base_template.html' %}
+
+{% block page_title %}
+Student Home
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+	<h1 class="display-1 text-center">Welcome {{student.first_name}} {{student.last_name}}</h1>
+</section>
+
+{% endblock main_content %}

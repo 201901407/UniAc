@@ -1,0 +1,83 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Select the fields
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Select all fields</h3>
+                </div>
+                <!-- /.card-header -->
+
+                            {% comment %} Display Messages {% endcomment %}
+                            {% if messages %}
+                            <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                {% if message.tags == "error" %}
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                {% elif message.tags == "success" %}
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            </div>
+                            {% endif %}
+                        
+                <form method="POST" action="{% url 'gen_pdf_res' %}">
+                    {% csrf_token %}
+                    <div class="card-body">
+                       
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="checkbox" name="fields[]" class="form-control" value="title"></div>
+                        <div class="form-group">
+                            <label>Sponsoring Authority</label>
+                            <input type="checkbox" name="fields[]" class="form-control" value="spron_auth">
+                        </div>
+                        <div class="form-group">
+                            <label>Cost</label>
+                            <input type="checkbox" name="fields[]" class="form-control" value="cost">
+                        </div>
+                        <div class="form-group">
+                            <label>Year of Completion</label>
+                            <input type="checkbox" name="fields[]" class="form-control" value="year_completed">
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+
+                    <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+
+                </form>
+
+                </div>
+                <!-- /.card -->
+
+
+
+            </div>
+        </div>
+        
+{% endblock main_content %}

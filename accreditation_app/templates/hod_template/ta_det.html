@@ -1,0 +1,54 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Current Teaching Assistant Details
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<section class="content">
+        <div class="row">
+			<div class="col-md-12">
+				<div class="card card-success">
+					<div class="card-header">
+						<h3 class="card-title">Current Teaching Assistants</h3>
+					</div>
+					
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table">
+								<thead class="thead-light">
+								<tr>
+									<th>Sr. no.</th>
+									<th>Student ID</th>
+									<th>Name</th>
+                                    <th>Guide</th>
+                                    <th>Area Of Work</th>
+                                    <th>Year of Registration</th>
+                                    <th>Type</th>
+								</tr>
+								</thead>
+								
+								{% for row in ta_det %}
+								<tr>
+									<td>{{ row.id }}</td>
+                                    <td>{{ row.student_id.id }}</td>
+									<td>{{ row.name }}</td>
+									<td>{{ row.guide.name }}</td>
+                                    <td>{{ row.area_of_work }}</td>
+                                    <td>{{ row.year_of_registration }}</td>
+                                    <td>{{ row.type }}</td>
+								</tr>
+								{% endfor %}
+							</table>
+						</div>
+                        <a class="btn btn-primary" href="{% url 'ta_print_form' %}" role="button">Print Report</a><br/>&nbsp;
+					</div>
+					<!-- /.card-body -->
+				</div>
+			</div>
+		</div>
+	
+	</div><!-- /.container-fluid -->
+{% endblock main_content %}
