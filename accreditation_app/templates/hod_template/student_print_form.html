@@ -49,13 +49,32 @@
                     <div class="card-body">
                        
                         <div class="form-group">
-                            <label>Gender</label>
-                            <input type="checkbox" name="fields[]" class="form-control" value="gender">
+                            <div class="form-row">
+                                <div class="col"><label>Name</label></div>
+                                <div class="col"><input type="checkbox" name="fields[]" value="admin__first_name" class="form-control" id = "namec" autocomplete="off" onclick="Checktorf(`namec`,`nameip`)"></div>
+                                <div class="col"><input type="text" name="headers[]" id = "nameip" class="form-control" value="Name" disabled></div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label>Address
-                            </label>
-                            <input type="checkbox" name="fields[]" class="form-control" value="address">
+                            <div class="form-row">
+                                <div class="col"><label>Email</label></div>
+                                <div class="col"><input type="checkbox" name="fields[]" value="admin__email" class="form-control" id = "emailc" autocomplete="off" onclick="Checktorf(`emailc`,`emailip`)"></div>
+                                <div class="col"><input type="text" name="headers[]" id = "emailip" class="form-control" value="Email" disabled></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-row">
+                                <div class="col"><label>Gender</label></div>
+                                <div class="col"><input type="checkbox" name="fields[]" value="gender" class="form-control" id = "genderc" autocomplete="off" onclick="Checktorf(`genderc`,`genderip`)"></div>
+                                <div class="col"><input type="text" name="headers[]" id = "genderip" class="form-control" value="Gender" disabled></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-row">
+                                <div class="col"><label>Address</label></div>
+                                <div class="col"><input type="checkbox" name="fields[]" value="address" class="form-control" id = "addc" autocomplete="off" onclick="Checktorf(`addc`,`addip`)"></div>
+                                <div class="col"><input type="text" name="headers[]" id = "addip" class="form-control" value="Address" disabled></div>
+                            </div>
                         </div>
                     <!-- /.card-body -->
 
@@ -72,5 +91,15 @@
 
             </div>
         </div>
-        
+        <script>
+            function Checktorf(field1,field2) {
+              var checkBox = document.getElementById(field1);
+              var text = document.getElementById(field2);
+              if (checkBox.checked == true){
+                text.disabled = false;
+              } else {
+                 text.disabled = true;
+              }
+            }
+        </script> 
 {% endblock main_content %}

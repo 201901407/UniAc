@@ -47,33 +47,54 @@
                 <form method="POST" action="{% url 'gen_pdf_staff' %}">
                     {% csrf_token %}
                     <div class="card-body">
-                       
                         <div class="form-group">
-                            <label>Name</label>
-                            <input type="checkbox" name="fields[]" class="form-control" value="name"></div>
-                        <div class="form-group">
-                            <label>Qualifications</label>
-                            <input type="checkbox" name="fields[]" class="form-control" value="qualifications">
+                            <div class="form-row">
+                                <div class="col"><label>Name</label></div>
+                                <div class="col"><input type="checkbox" name="fields[]" value="name" class="form-control" id = "namec" autocomplete="off" onclick="Checktorf(`namec`,`nameip`)"></div>
+                                <div class="col"><input type="text" name="headers[]" id = "nameip" class="form-control" value="Name" disabled></div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label>Designation</label>
-                            <input type="checkbox" name="fields[]" class="form-control" value="designation">
+                            <div class="form-row">
+                                <div class="col"><label>Qualifications</label></div>
+                                <div class="col"><input type="checkbox" name="fields[]" value="qualifications" class="form-control" id = "qualic" autocomplete="off" onclick="Checktorf(`qualic`,`qualiip`)"></div>
+                                <div class="col"><input type="text" name="headers[]" id = "qualiip" class="form-control" value="Qualifications" disabled></div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label>Area Of Specialisation</label>
-                            <input type="checkbox" name="fields[]" class="form-control" value="area_of_specialisation">
+                            <div class="form-row">
+                                <div class="col"><label>Designation</label></div>
+                                <div class="col"><input type="checkbox" name="fields[]" value="designation" class="form-control" id = "desic" autocomplete="off" onclick="Checktorf(`desic`,`desiip`)"></div>
+                                <div class="col"><input type="text" name="headers[]" id = "desiip" class="form-control" value="Designation" disabled></div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label>Experience</label>
-                            <input type="checkbox" name="fields[]" class="form-control" value="experience">
+                            <div class="form-row">
+                                <div class="col"><label>Area Of Specialisation</label></div>
+                                <div class="col"><input type="checkbox" name="fields[]" value="area_of_specialisation" class="form-control" id = "aspecc" autocomplete="off" onclick="Checktorf(`aspecc`,`aspecip`)"></div>
+                                <div class="col"><input type="text" name="headers[]" id = "aspecip" class="form-control" value="Area Of Specialisation" disabled></div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label>Number Of Doctorate Students Guided</label>
-                            <input type="checkbox" name="fields[]" class="form-control" value="number_of_doctorate_students_guided">
+                            <div class="form-row">
+                                <div class="col"><label>Experience</label></div>
+                                <div class="col"><input type="checkbox" name="fields[]" value="experience" class="form-control" id = "expic" autocomplete="off" onclick="Checktorf(`expic`,`expip`)"></div>
+                                <div class="col"><input type="text" name="headers[]" id = "expip" class="form-control" value="Experience" disabled></div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label>Number Of Graduate Students Guided</label>
-                            <input type="checkbox" name="fields[]" class="form-control" value="number_of_graduate_students_guided">
+                            <div class="form-row">
+                                <div class="col"><label>Number Of Doctorate Students Guided</label></div>
+                                <div class="col"><input type="checkbox" name="fields[]" value="number_of_doctorate_students_guided" class="form-control" id = "ndc" autocomplete="off" onclick="Checktorf(`ndc`,`ndip`)"></div>
+                                <div class="col"><input type="text" name="headers[]" id = "ndip" class="form-control" value="Number Of Doctorate Students Guided" disabled></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-row">
+                                <div class="col"><label>Number Of Graduate Students Guided</label></div>
+                                <div class="col"><input type="checkbox" name="fields[]" value="number_of_graduate_students_guided" class="form-control" id = "ngc" autocomplete="off" onclick="Checktorf(`ngc`,`ngip`)"></div>
+                                <div class="col"><input type="text" name="headers[]" id = "ngip" class="form-control" value="Number Of Graduate Students Guided" disabled></div>
+                            </div>
                         </div>
                     </div>
                     <!-- /.card-body -->
@@ -91,5 +112,15 @@
 
             </div>
         </div>
-        
+        <script>
+            function Checktorf(field1,field2) {
+              var checkBox = document.getElementById(field1);
+              var text = document.getElementById(field2);
+              if (checkBox.checked == true){
+                text.disabled = false;
+              } else {
+                 text.disabled = true;
+              }
+            }
+        </script>  
 {% endblock main_content %}

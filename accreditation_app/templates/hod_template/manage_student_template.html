@@ -44,16 +44,18 @@
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">Student Details</h3>
-
-                            <div class="card-tools">
-                            <div class="input-group input-group-sm" style="width: 150px;">
-                                <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
-
-                                <div class="input-group-append">
-                                <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                            <form method="POST" action="{% url 'search_student' %}" class="card-tools">
+                                {% csrf_token %}
+                                <div class="card-tools">
+                                    <div class="input-group input-group-sm" style="width: auto;">
+                                        <input type="text" name="table_search" class="form-control float-right" placeholder="Search with First Name">
+        
+                                        <div class="input-group-append">
+                                        <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                        </div>
                                 </div>
-                            </div>
-                            </div>
+                                </div>
+                            </form>
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body table-responsive p-0">
@@ -83,7 +85,7 @@
                                 <td>{{ student.admin.email }}</td>
                                 <td>{{ student.address }}</td>
                                 <td>{{ student.gender }}</td>
-                                <td> <img src="{{ student.profile_pic }}" style="width: 100px;" /> </td>
+                                <td> <img src="{{MEDIA_URL}}{{student.profile_pic}}" class="img-responsive" style="width: 100px; height: auto;" /> </td>
                                 <td>{{ student.admin.last_login }}</td>
                                 <td>{{ student.admin.date_joined }}</td>
                                 <td>

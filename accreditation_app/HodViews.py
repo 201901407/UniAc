@@ -1,3 +1,5 @@
+from ast import keyword
+from distutils.log import error
 from turtle import position, title
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -67,6 +69,9 @@ def add_staff_save(request):
 												last_name=last_name,
 												user_type=2)
 			user.save()
+			staff_obj = Staffs.objects.get(admin=user.id)
+			staff_obj.name = first_name+" "+last_name
+			staff_obj.save()
 			messages.success(request, "Staff Added Successfully!")
 			return redirect('add_staff')
 		except:
@@ -85,7 +90,7 @@ def manage_staff(request):
 
 def edit_staff(request, staff_id):
 	staff = Staffs.objects.get(admin=staff_id)
-
+	
 	context = {
 		"staff": staff,
 		"id": staff_id
@@ -93,13 +98,12 @@ def edit_staff(request, staff_id):
 	return render(request, "hod_template/edit_staff_template.html", context)
 
 
-def edit_staff_save(request):
+def edit_staff_save(request,staff_id):
 	if request.method != "POST":
 		return HttpResponse("<h2>Method Not Allowed</h2>")
 	else:
-		staff_id = request.POST.get('staff_id')
+		print("kop")
 		username = request.POST.get('username')
-		email = request.POST.get('email')
 		first_name = request.POST.get('first_name')
 		last_name = request.POST.get('last_name')
 		quali = request.POST.get('quali')
@@ -111,26 +115,35 @@ def edit_staff_save(request):
 
 		try:
 			# INSERTING into Customuser Model
+			print("kop")
 			user = CustomUser.objects.get(id=staff_id)
+			print("kop")
 			user.first_name = first_name
 			user.last_name = last_name
-			user.email = email
 			user.username = username
+			user.password = user.password
+			print("kop")
 			user.save()
-			
+			print("kop")
 			# INSERTING into Staff Model
 			staff_obj = Staffs.objects.get(admin=staff_id)
+			print("kop")
+			if quali is None:
+				quali = staff_obj.qualifications
+			if des is None:
+				des = staff_obj.designation
+			#staff_obj.name = staff_obj.name
 			staff_obj.qualifications = quali
 			staff_obj.designation = des
 			staff_obj.area_of_specialisation = area
 			staff_obj.experience = exp
 			staff_obj.number_of_doctorate_students_guided = doct
 			staff_obj.number_of_graduate_students_guided = grad
+			print(des)
 			staff_obj.save()
-
+			print("kop")
 			messages.success(request, "Staff Updated Successfully.")
 			return redirect('/edit_staff/'+staff_id)
-
 		except:
 			messages.error(request, "Failed to Update Staff.")
 			return redirect('/edit_staff/'+staff_id)
@@ -139,8 +152,10 @@ def edit_staff_save(request):
 
 def delete_staff(request, staff_id):
 	staff = Staffs.objects.get(admin=staff_id)
+	user = CustomUser.objects.get(id=staff_id)
 	try:
 		staff.delete()
+		user.delete()
 		messages.success(request, "Staff Deleted Successfully.")
 		return redirect('manage_staff')
 	except:
@@ -163,47 +178,49 @@ def add_student_save(request):
 		messages.error(request, "Invalid Method")
 		return redirect('add_student')
 	else:
-		form = AddStudentForm(request.POST, request.FILES)
+		
+		first_name = request.POST.get('first_name')
+		last_name = request.POST.get('last_name')
+		username = request.POST.get('username')
+		email = request.POST.get('email')
+		password = request.POST.get('password')
+		address = request.POST.get('address')
+		gender = request.POST.get('gender')
 
-		if form.is_valid():
-			first_name = form.cleaned_data['first_name']
-			last_name = form.cleaned_data['last_name']
-			username = form.cleaned_data['username']
-			email = form.cleaned_data['email']
-			password = form.cleaned_data['password']
-			address = form.cleaned_data['address']
-			gender = form.cleaned_data['gender']
+		if not first_name or not last_name or not username or not email or not password:
+			messages.error(request, "Please fill all fields!")
+			return redirect('add_student')
 
-			
-			if len(request.FILES) != 0:
-				profile_pic = request.FILES['profile_pic']
-				fs = FileSystemStorage()
-				filename = fs.save(profile_pic.name, profile_pic)
-				profile_pic_url = fs.url(filename)
-			else:
-				profile_pic_url = None
+		if len(request.FILES) != 0:
+			profile_pic = request.FILES['profile_pic']
+			fs = FileSystemStorage()
+			filename = fs.save(profile_pic.name, profile_pic)
+			profile_pic_url = fs.url(filename)
+			print("lfvoprm")
+		else:
+			print("opppp")
+			profile_pic_url = None
 
 
-			try:
-				user = CustomUser.objects.create_user(username=username,
+		try:
+			user = CustomUser.objects.create_user(username=username,
 													password=password,
 													email=email,
 													first_name=first_name,
 													last_name=last_name,
 													user_type=3)
-				user.students.address = address
+			user.students.address = address
 
 	
 
-				user.students.gender = gender
-				user.students.profile_pic = profile_pic_url
-				user.save()
-				messages.success(request, "Student Added Successfully!")
-				return redirect('add_student')
-			except:
-				messages.error(request, "Failed to Add Student!")
-				return redirect('add_student')
-		else:
+			user.students.gender = gender
+			user.students.profile_pic = profile_pic_url
+			print("letsgo")
+			user.save()
+			messages.success(request, "Student Added Successfully!")
+			return redirect('add_student')
+		except:
+			messages.error(request, "Failed to Add Student!")
 			return redirect('add_student')
 
 
@@ -302,8 +319,10 @@ def edit_student_save(request):
 
 def delete_student(request, student_id):
 	student = Students.objects.get(admin=student_id)
+	user = CustomUser.objects.get(id = student_id)
 	try:
 		student.delete()
+		user.delete()
 		messages.success(request, "Student Deleted Successfully.")
 		return redirect('manage_student')
 	except:
@@ -460,9 +479,11 @@ def render_to_pdf(template_src, context_dict={}):
 def gen_pdf_staff(request):
 	req_fields = request.POST.getlist('fields[]')
 	rec = Staffs.objects.values(*req_fields)
+	req_headers = request.POST.getlist('headers[]')
 	return render_to_pdf('hod_template/pdf.html',
 	{
 		'record':rec,
+		'headers':req_headers,
 	})
 
 def staff_print_form(request):
@@ -470,10 +491,17 @@ def staff_print_form(request):
 
 def gen_pdf_student(request):
 	req_fields = request.POST.getlist('fields[]')
+	for f in req_fields:
+		if f is "adminname":
+			f = "admin.name"
+		elif f is "adminemail":
+			f = "admin.email"
 	rec = Students.objects.values(*req_fields)
+	req_headers = request.POST.getlist('headers[]')
 	return render_to_pdf('hod_template/pdf.html',
 	{
 		'record':rec,
+		'headers':req_headers,
 	})
 
 def student_print_form(request):
@@ -519,3 +547,20 @@ def gen_pdf_ta(request):
 		'record':rec,
 	})
 
+def search_student(request):
+	keyword = request.POST.get("table_search")
+	""" count = 0
+	print(keyword)
+	for i in keyword:
+		count = count + 1
+		print(i)
+	if count == 0:
+		keyword.append(" ")
+		keyword.append(" ")
+	if count == 1:
+		keyword.append(" ") """
+	rec = Students.objects.filter(admin__first_name__contains = keyword)
+	context = {
+		"students": rec
+	}
+	return render(request, 'hod_template/manage_student_template.html', context)

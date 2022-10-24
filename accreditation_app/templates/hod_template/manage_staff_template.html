@@ -63,8 +63,7 @@
                             <thead>
                                 <tr>
                                 <th>ID</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
+                                <th>Name</th>
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>Qualifications</th>
@@ -82,8 +81,7 @@
                                 {% for staff in staffs %}
                                 <tr>
                                 <td>{{ staff.admin.id }}</td>
-                                <td>{{ staff.admin.first_name }}</td>
-                                <td>{{ staff.admin.last_name }}</td>
+                                <td>{{ staff.name }}</td>
                                 <td>{{ staff.admin.username }}</td>
                                 <td>{{ staff.admin.email }}</td>
                                 <td>{{ staff.qualifications }}</td>

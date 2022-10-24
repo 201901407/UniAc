@@ -20,7 +20,7 @@
                     </div>
                     <!-- /.card-header -->
                     <!-- form start -->
-                    <form role="form" method="POST" action="{% url 'edit_staff_save' %}">
+                    <form role="form" method="POST" action="{% url 'edit_staff_save' staff.admin.id %}">
                         {% csrf_token %}
 
                         
@@ -51,20 +51,11 @@
                             
 
                         <div class="card-body">
-                            <div class="form-group">
-                                <label>Email address</label>
-                                <input type="email" class="form-control" name="email" value="{{ staff.admin.email }}">
-                            </div>
-
+                            
                             <div class="form-group">
                                 <label>Username</label>
                                 <input type="text" class="form-control" name="username" value="{{ staff.admin.username }}">
                             </div>
-
-                            {% comment %} <div class="form-group">
-                                <label>Password</label>
-                                <input type="password" class="form-control" name="password" value="{{ staff.admin.password }}">
-                            </div> {% endcomment %}
 
                             <div class="form-group">
                                 <label>First Name</label>
@@ -74,13 +65,12 @@
                             <div class="form-group">
                                 <label>Last Name</label>
                                 <input type="text" class="form-control" name="last_name" value="{{ staff.admin.last_name }}">
-                                <input type="hidden" name="staff_id" value="{{ staff.admin.id }}" />
                             </div>
 
                             <div class="form-group">
                                 <label>Qualifications</label>
                                 <select name="quali" class="form-control">
-                                    <option value="" selected disabled hidden>{{ staff.qualifications }}</option>
+                                    <option value="{{ staff.qualifications }}" selected disabled hidden>{{ staff.qualifications }}</option>
                                     <option value="Bachelor of Technology">Bachelor of Technology</option>
                                     <option value="Bachelor of Science">Bachelor of Science</option>
                                     <option value="Master of Technology">Master of Technology</option>
@@ -91,7 +81,7 @@
                             <div class="form-group">
                                 <label>Designation</label>
                                 <select name="des" class="form-control">
-                                    <option value="" selected disabled hidden>{{ staff.designation }}</option>
+                                    <option value="{{ staff.designation }}" selected disabled hidden>{{ staff.designation }}</option>
                                     <option value="Lecturer">Lecturer</option>
                                     <option value="Assistant Professor">Assistant Professor</option>
                                     <option value="Associate Professor">Associate Professor</option>
@@ -104,15 +94,15 @@
                             </div>
                             <div class="form-group">
                                 <label>Experience (in years)</label>
-                                <input type="number" name="exp" class="form-control" value= {{ staff.experience }}>
+                                <input type="number" name="exp" class="form-control" value= "{{ staff.experience }}">
                             </div>
                             <div class="form-group">
                                 <label>Number Of Doctorate Students Guided</label>
-                                <input type="number" name="doct" class="form-control" value={{ staff.number_of_doctorate_students_guided }}>
+                                <input type="number" name="doct" class="form-control" value="{{ staff.number_of_doctorate_students_guided }}">
                             </div>
                             <div class="form-group">
                                 <label>Number Of Graduate Students Guided</label>
-                                <input type="number" name="grad" class="form-control" value={{ staff.number_of_graduate_students_guided }}>
+                                <input type="number" name="grad" class="form-control" value="{{ staff.number_of_graduate_students_guided }}">
                             </div>
                             
 

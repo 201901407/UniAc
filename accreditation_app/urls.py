@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 from .import HodViews, StaffViews, StudentViews
 
@@ -33,7 +35,7 @@ urlpatterns = [
 	path('add_staff_save/', HodViews.add_staff_save, name="add_staff_save"),
 	path('manage_staff/', HodViews.manage_staff, name="manage_staff"),
 	path('edit_staff/<staff_id>/', HodViews.edit_staff, name="edit_staff"),
-	path('edit_staff_save/', HodViews.edit_staff_save, name="edit_staff_save"),
+	path('edit_staff_save/<staff_id>/', HodViews.edit_staff_save, name="edit_staff_save"),
 	path('delete_staff/<staff_id>/', HodViews.delete_staff, name="delete_staff"),
 	path('add_student/', HodViews.add_student, name="add_student"),
 	path('add_student_save/', HodViews.add_student_save, name="add_student_save"),
@@ -60,4 +62,5 @@ urlpatterns = [
 	path('ta_details/',HodViews.ta_details,name="ta_details"),
 	path('ta_print_form/',HodViews.ta_print_form,name="ta_print_form"),
 	path('gen_pdf_ta/',HodViews.gen_pdf_ta,name="gen_pdf_ta"),
-]
+	path('search_student/',HodViews.search_student,name="search_student"),
+]+ static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

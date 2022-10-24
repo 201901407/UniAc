@@ -38,13 +38,9 @@
                         <table>
                             <thead>
                             <tr>
-                                {% for item in record %}
-                                {% if forloop.first %}
-                                    {% for h in item %}
-                                        <th>{{ h }}</th>
-                                    {% endfor %}
-                                {% endif%}
-                            {% endfor %}
+                                {% for item in headers %}
+                                        <th>{{ item }}</th>
+                                {% endfor %}
                             </tr> 
                             </thead> 
                             

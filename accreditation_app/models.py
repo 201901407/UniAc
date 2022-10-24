@@ -51,11 +51,13 @@ class Students(models.Model):
 	id = models.AutoField(primary_key=True)
 	admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
 	gender = models.CharField(max_length=50,default="")
-	profile_pic = models.FileField(default="")
+	profile_pic = models.FileField(upload_to='images/',null=True)
 	address = models.TextField(default="")
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = models.Manager()
+	def __str__(self):
+		return self.admin.username + ": " + str(self.profile_pic)
 
 class ta(models.Model):
 	id = models.AutoField(primary_key=True)
