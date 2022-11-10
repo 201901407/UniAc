@@ -22,14 +22,31 @@ class CustomUser(AbstractUser):
 	user_type_data = ((HOD, "HOD"), (STAFF, "Staff"), (STUDENT, "Student"))
 	user_type = models.CharField(default=1, choices=user_type_data, max_length=10)
 
+class institute_details(models.Model):
+	id = models.AutoField(primary_key=True)
+	name = models.TextField(max_length=255)
+	address = models.TextField(default="")
+	city = models.TextField(default="")
+	state = models.TextField(default="")
+	pin = models.BigIntegerField(default=0)
+	website = models.CharField(max_length=400,default="")
+	area = models.BigIntegerField(default=0)
+	builtup_area = models.BigIntegerField(default=0)
+	recognition_date = models.DateField(default=datetime.date.today)
+	campus_type = models.TextField(default="")
+	institute_type = models.TextField(default="")
+	institute_nature = models.TextField(default="")
+	establishment_date = models.DateField(default=datetime.date.today)
+	mail_prefix = models.TextField(default="")
+	objects = models.Manager()
 
 class AdminHOD(models.Model):
 	id = models.AutoField(primary_key=True)
 	admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
+	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = models.Manager()
-
 
 class Staffs(models.Model):
 	id = models.AutoField(primary_key=True)
@@ -41,6 +58,7 @@ class Staffs(models.Model):
 	experience = models.IntegerField(default=0) 
 	number_of_doctorate_students_guided = models.BigIntegerField(default=0)
 	number_of_graduate_students_guided = models.BigIntegerField(default=0)
+	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	#address = models.TextField()
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
@@ -53,6 +71,7 @@ class Students(models.Model):
 	gender = models.CharField(max_length=50,default="")
 	profile_pic = models.FileField(upload_to='images/',null=True)
 	address = models.TextField(default="")
+	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = models.Manager()
@@ -87,7 +106,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 			Students.objects.create(admin=instance,
 									address="",
 									profile_pic="",
-									gender="")
+									gender="Male",institute_to_belong=instance.inst_obj)
 	
 
 @receiver(post_save, sender=CustomUser)
@@ -105,6 +124,7 @@ class research_area(models.Model):
 	title = models.TextField(max_length=1000)
 	spron_auth = models.TextField(max_length=255)
 	cost = models.BigIntegerField(default=1,validators=[MinValueValidator(1)])
+	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	objects = models.Manager()
 
 class committee_and_board(models.Model):
@@ -112,4 +132,5 @@ class committee_and_board(models.Model):
 	name = models.TextField(max_length=255)
 	position = models.TextField(max_length=255)
 	address = models.CharField(max_length=600)
+	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	committee = models.CharField(max_length=255)

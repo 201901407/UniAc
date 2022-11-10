@@ -60,7 +60,7 @@ def student_profile_update(request):
 def grad_student_fill_accreditation(request):
 	stud_obj = Students.objects.get(admin=request.user.id)
 	op_obj = ta.objects.filter(student_id = stud_obj.id).first()
-	all_faculty = Staffs.objects.all()
+	all_faculty = Staffs.objects.filter(institute_to_belong = stud_obj.institute_to_belong).all()
 	if not op_obj:
 		context = {
 			'all_faculty': all_faculty,

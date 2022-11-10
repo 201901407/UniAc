@@ -14,6 +14,8 @@ urlpatterns = [
 	path('registration', views.registration, name="registration"),
 	path('doLogin', views.doLogin, name="doLogin"),
 	path('doRegistration', views.doRegistration, name="doRegistration"),
+	path('inreg',views.inreg,name="inreg"),
+	path('doInstReg', views.doInstReg, name="doInstReg"),
 	
 	# URLS for Student
 	path('student_home/', StudentViews.student_home, name="student_home"),

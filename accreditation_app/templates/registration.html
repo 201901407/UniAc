@@ -146,15 +146,25 @@ body{
 			{% csrf_token %}
 
 		<h1 class="text-center">Signup</h1>
-            <div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>
+            <!--<div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>-->
 			 <div class="form-group"><input class="form-control mb-2" type="text" name="first_name" placeholder="First Name"></div>
             <div class="form-group"><input class="form-control mb-2" type="text" name="last_name" placeholder="Last Name"></div>
-
+            <select name="user_type" class="form-control mb-2" style="color: white; width: 100%;">
+              <option value="hod" style="color: black;">HOD/Admin</option>
+              <option value="staff" style="color: black;">Staff</option>
+              <option value="student" style="color: black;">Student</option>
+          </select>
+          <select name="institute_name" class="form-control mb-2" style="color: white; width: 100%;">
+            {% for i in institutes%}
+            <option value={{ i.id }} style="color: black;">{{i.name}}</option>
+            {% endfor %}
+        </select>
             <div class="form-group"><input class="form-control mb-2" type="email" name="email" placeholder="Email"></div>
             <div class="form-group"><input class="form-control mb-2" type="password" name="password" placeholder="Password"></div>
 			<div class="form-group"><input class="form-control mb-2" type="password" name="confirmPassword" placeholder="Confirm Password"></div>
             <div class="form-group"><button class="btn btn-primary btn-block mt-2 ml-2" type="submit">Register</button></div></form>
     </div>
+
  {% comment %} Display Messages {% endcomment %}
           {% if messages %}
           <div class="col-12">
@@ -162,8 +172,9 @@ body{
               {% if message.tags == "error" %}
                 <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
                   <b>{{ message }}</b>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 </div>
               {% endif %}
             {% endfor %}

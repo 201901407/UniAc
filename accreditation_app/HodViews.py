@@ -13,25 +13,25 @@ import json
 
 from .forms import AddStudentForm, EditStudentForm
 
-from .models import CustomUser, Staffs, Students, committee_and_board, research_area,ta
+from .models import CustomUser, Staffs, Students, committee_and_board, research_area,ta,AdminHOD,institute_details
 
 
 def admin_home(request):
-	
-	all_student_count = Students.objects.all().count()
-	staff_count = Staffs.objects.all().count()
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	all_student_count = Students.objects.filter(institute_to_belong=admin_obj.institute_to_belong).count()
+	staff_count = Staffs.objects.filter(institute_to_belong=admin_obj.institute_to_belong).count()
 	
 	# For Saffs
 	staff_name_list=[]
 
-	staffs = Staffs.objects.all()
+	staffs = Staffs.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
 	for staff in staffs:
 		staff_name_list.append(staff.admin.first_name)
 
 	# For Students
 	student_name_list=[]
 
-	students = Students.objects.all()
+	students = Students.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
 	for student in students:
 		student_name_list.append(student.admin.first_name)
 
@@ -61,6 +61,14 @@ def add_staff_save(request):
 		password = request.POST.get('password')
 		#address = request.POST.get('address')
 
+		admin_obj = AdminHOD.objects.get(admin=request.user.id)
+		mp = institute_details.objects.get(id=admin_obj.institute_to_belong.id)
+		pref = email.split('@')[1].split('.')[0]
+
+		if pref != mp.mail_prefix:
+			messages.error(request, "Please enter valid e-mail ID!!")
+			return redirect('add_staff')
+
 		try:
 			user = CustomUser.objects.create_user(username=username,
 												password=password,
@@ -69,8 +77,10 @@ def add_staff_save(request):
 												last_name=last_name,
 												user_type=2)
 			user.save()
+			admin_obj = AdminHOD.objects.get(admin=request.user.id)
 			staff_obj = Staffs.objects.get(admin=user.id)
 			staff_obj.name = first_name+" "+last_name
+			staff_obj.institute_to_belong = admin_obj.institute_to_belong
 			staff_obj.save()
 			messages.success(request, "Staff Added Successfully!")
 			return redirect('add_staff')
@@ -81,7 +91,8 @@ def add_staff_save(request):
 
 
 def manage_staff(request):
-	staffs = Staffs.objects.all()
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	staffs = Staffs.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
 	context = {
 		"staffs": staffs
 	}
@@ -186,6 +197,7 @@ def add_student_save(request):
 		password = request.POST.get('password')
 		address = request.POST.get('address')
 		gender = request.POST.get('gender')
+		admin_obj = AdminHOD.objects.get(admin=request.user.id)
 
 		if not first_name or not last_name or not username or not email or not password:
 			messages.error(request, "Please fill all fields!")
@@ -198,25 +210,26 @@ def add_student_save(request):
 			profile_pic_url = fs.url(filename)
 			print("lfvoprm")
 		else:
-			print("opppp")
 			profile_pic_url = None
 
 
 		try:
+			print("letsgo")
 			user = CustomUser.objects.create_user(username=username,
 													password=password,
 													email=email,
 													first_name=first_name,
 													last_name=last_name,
 													user_type=3)
-			user.students.address = address
-
-	
-
-			user.students.gender = gender
-			user.students.profile_pic = profile_pic_url
-			print("letsgo")
 			user.save()
+			print("go")
+			student_obj = Students.objects.get(admin=user.id)
+			print("letsgo")
+			student_obj.address = address
+			student_obj.gender = gender
+			student_obj.profile_pic = profile_pic_url
+			student_obj.institute_to_belong = admin_obj.institute_to_belong
+			student_obj.save()
 			messages.success(request, "Student Added Successfully!")
 			return redirect('add_student')
 		except:
@@ -225,7 +238,8 @@ def add_student_save(request):
 
 
 def manage_student(request):
-	students = Students.objects.all()
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	students = Students.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
 	context = {
 		"students": students
 	}
@@ -332,6 +346,13 @@ def delete_student(request, student_id):
 @csrf_exempt
 def check_email_exist(request):
 	email = request.POST.get("email")
+	print()
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	mp = institute_details.objects.get(id=admin_obj.institute_to_belong.id)
+	pref = email.split('@')[1].split('.')[0]
+	print(pref)
+	if pref != mp.mail_prefix:
+		return HttpResponse(True)
 	user_obj = CustomUser.objects.filter(email=email).exists()
 	if user_obj:
 		return HttpResponse(True)

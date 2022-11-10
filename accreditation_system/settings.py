@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'accreditation_app.middleware.LoginRequiredMiddleware'
 ]
 
 ROOT_URLCONF = 'accreditation_system.urls'
@@ -131,3 +132,5 @@ STATIC_ROOT=os.path.join(BASE_DIR,"static")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accreditation_app.CustomUser'
+AUTH_EXEMPT_ROUTES = ('admin/', 'home', 'contact','login','registration','doLogin','doRegistration','inreg','doInstReg')
+AUTH_LOGIN_ROUTE = 'login'
