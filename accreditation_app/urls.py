@@ -6,7 +6,7 @@ from . import views
 from .import HodViews, StaffViews, StudentViews
 
 urlpatterns = [
-	path('admin/', admin.site.urls),
+	path('admin/', admin.site.urls,name="admin"),
 	path('', views.home, name="home"),
 	path('contact', views.contact, name="contact"),
 	path('login', views.loginUser, name="login"),
@@ -65,4 +65,9 @@ urlpatterns = [
 	path('ta_print_form/',HodViews.ta_print_form,name="ta_print_form"),
 	path('gen_pdf_ta/',HodViews.gen_pdf_ta,name="gen_pdf_ta"),
 	path('search_student/',HodViews.search_student,name="search_student"),
+	path('search_staff/',HodViews.search_staff,name="search_staff"),
+	path('edit_inst/',HodViews.edit_inst,name="edit_inst"),
+	path('edit_inst_save/',HodViews.edit_inst_save,name="edit_inst_save"),
+	path('view_expense/',HodViews.view_expense,name="view_expense"),
+	path('add_expense_save/',HodViews.add_expense_save,name="add_expense_save"),
 ]+ static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

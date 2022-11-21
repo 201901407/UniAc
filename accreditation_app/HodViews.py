@@ -1,4 +1,5 @@
 from ast import keyword
+from datetime import datetime
 from distutils.log import error
 from turtle import position, title
 from django.shortcuts import render, redirect
@@ -13,7 +14,7 @@ import json
 
 from .forms import AddStudentForm, EditStudentForm
 
-from .models import CustomUser, Staffs, Students, committee_and_board, research_area,ta,AdminHOD,institute_details
+from .models import CustomUser, Staffs, Students, committee_and_board, research_area,ta,AdminHOD,institute_details,expense_details
 
 
 def admin_home(request):
@@ -60,8 +61,16 @@ def add_staff_save(request):
 		email = request.POST.get('email')
 		password = request.POST.get('password')
 		#address = request.POST.get('address')
-
 		admin_obj = AdminHOD.objects.get(admin=request.user.id)
+
+		op = CustomUser.objects.filter(email=email).exists()
+		isboth = CustomUser.objects.filter(email=email,username=username).exists()
+		isuser = CustomUser.objects.filter(username=username).exists()
+
+		if op or isboth or isuser:
+			messages.error(request, "Staff with following credentials already exists!")
+			return redirect('add_staff')
+
 		mp = institute_details.objects.get(id=admin_obj.institute_to_belong.id)
 		pref = email.split('@')[1].split('.')[0]
 
@@ -69,13 +78,14 @@ def add_staff_save(request):
 			messages.error(request, "Please enter valid e-mail ID!!")
 			return redirect('add_staff')
 
+
 		try:
-			user = CustomUser.objects.create_user(username=username,
+			user = CustomUser.objects.create(username=username,
 												password=password,
 												email=email,
 												first_name=first_name,
 												last_name=last_name,
-												user_type=2)
+												user_type="staff")
 			user.save()
 			admin_obj = AdminHOD.objects.get(admin=request.user.id)
 			staff_obj = Staffs.objects.get(admin=user.id)
@@ -131,7 +141,7 @@ def edit_staff_save(request,staff_id):
 			print("kop")
 			user.first_name = first_name
 			user.last_name = last_name
-			user.username = username
+			user.username = user.username
 			user.password = user.password
 			print("kop")
 			user.save()
@@ -203,6 +213,14 @@ def add_student_save(request):
 			messages.error(request, "Please fill all fields!")
 			return redirect('add_student')
 
+		op = CustomUser.objects.filter(email=email).exists()
+		isboth = CustomUser.objects.filter(email=email,username=username).exists()
+		isuser = CustomUser.objects.filter(username=username).exists()
+
+		if op or isboth or isuser:
+			messages.error(request, "Student with following credentials already exists!")
+			return redirect('add_student')
+
 		if len(request.FILES) != 0:
 			profile_pic = request.FILES['profile_pic']
 			fs = FileSystemStorage()
@@ -214,22 +232,20 @@ def add_student_save(request):
 
 
 		try:
-			print("letsgo")
-			user = CustomUser.objects.create_user(username=username,
+			#print("letsgo")
+			print(password)
+			user = CustomUser.objects.create(username=username,
 													password=password,
 													email=email,
 													first_name=first_name,
 													last_name=last_name,
-													user_type=3)
+													user_type="student")
 			user.save()
-			print("go")
-			student_obj = Students.objects.get(admin=user.id)
-			print("letsgo")
-			student_obj.address = address
-			student_obj.gender = gender
-			student_obj.profile_pic = profile_pic_url
-			student_obj.institute_to_belong = admin_obj.institute_to_belong
-			student_obj.save()
+			user.students.address = address
+			user.students.gender = gender
+			user.students.profile_pic = profile_pic_url
+			user.students.institute_to_belong = admin_obj.institute_to_belong
+			user.save()
 			messages.success(request, "Student Added Successfully!")
 			return redirect('add_student')
 		except:
@@ -304,7 +320,7 @@ def edit_student_save(request):
 				user = CustomUser.objects.get(id=student_id)
 				user.first_name = first_name
 				user.last_name = last_name
-				user.username = username
+				user.username = user.username
 				user.save()
 
 				# Then Update Students Table
@@ -323,7 +339,7 @@ def edit_student_save(request):
 				messages.success(request, "Student Updated Successfully!")
 				return redirect('/edit_student/'+student_id)
 			except:
-				messages.error(request, "Failed to Uupdate Student.")
+				messages.error(request, "Failed to Update Student.")
 				return redirect('/edit_student/'+student_id)
 		else:
 			messages.error(request,"Please enter the details correctly.")
@@ -346,7 +362,6 @@ def delete_student(request, student_id):
 @csrf_exempt
 def check_email_exist(request):
 	email = request.POST.get("email")
-	print()
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
 	mp = institute_details.objects.get(id=admin_obj.institute_to_belong.id)
 	pref = email.split('@')[1].split('.')[0]
@@ -410,7 +425,8 @@ def student_profile(request):
 	pass
 
 def add_research_project(request):
-	op = research_area.objects.all()
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	op = research_area.objects.filter(institute_to_belong = admin_obj.institute_to_belong)
 	context = {
 		'research_area':op
 	}
@@ -434,12 +450,14 @@ def add_research_project_save(request):
 		if op:
 			messages.error(request, "This Project already exists.")
 			return redirect('res_proj_details')
+		admin_obj = AdminHOD.objects.get(admin=request.user.id)
 		try:
 			research_area.objects.create(
 				title=title,
 				spron_auth=spron_auth,
 				cost=cost,
 				year_completed=yc,
+				institute_to_belong = admin_obj.institute_to_belong,
 			)
 			messages.success(request, "Details uploaded successfully.")
 			return redirect('res_proj_details')
@@ -448,7 +466,8 @@ def add_research_project_save(request):
 			return redirect('res_proj_details')
 
 def add_comb(request):
-	op = committee_and_board.objects.all()
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	op = committee_and_board.objects.filter(institute_to_belong = admin_obj.institute_to_belong)
 	context = {
 		'cab':op
 	}
@@ -463,11 +482,13 @@ def add_comb_save(request):
 		pos = request.POST.get('pos')
 		add = request.POST.get('add')
 		com = request.POST.get('com')
+		admin_obj = AdminHOD.objects.get(admin=request.user.id)
 		op = committee_and_board.objects.filter(
 			name=name,
 			position=pos,
 			address=add,
 			committee=com,
+			institute_to_belong=admin_obj.institute_to_belong,
 		)
 		if op:
 			messages.error(request, "This Member already exists.")
@@ -478,6 +499,7 @@ def add_comb_save(request):
 				position=pos,
 				address=add,
 				committee=com,
+				institute_to_belong=admin_obj.institute_to_belong,
 			)
 			messages.success(request, "Details uploaded successfully.")
 			return redirect('add_comb')
@@ -499,7 +521,8 @@ def render_to_pdf(template_src, context_dict={}):
 
 def gen_pdf_staff(request):
 	req_fields = request.POST.getlist('fields[]')
-	rec = Staffs.objects.values(*req_fields)
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	rec = Staffs.objects.filter(institute_to_belong=admin_obj.institute_to_belong).values(*req_fields)
 	req_headers = request.POST.getlist('headers[]')
 	return render_to_pdf('hod_template/pdf.html',
 	{
@@ -517,7 +540,8 @@ def gen_pdf_student(request):
 			f = "admin.name"
 		elif f is "adminemail":
 			f = "admin.email"
-	rec = Students.objects.values(*req_fields)
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	rec = Students.objects.filter(institute_to_belong=admin_obj.institute_to_belong).values(*req_fields)
 	req_headers = request.POST.getlist('headers[]')
 	return render_to_pdf('hod_template/pdf.html',
 	{
@@ -530,7 +554,8 @@ def student_print_form(request):
 
 def gen_pdf_res(request):
 	req_fields = request.POST.getlist('fields[]')
-	rec = research_area.objects.values(*req_fields)
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	rec = research_area.objects.filter(institute_to_belong=admin_obj.institute_to_belong).values(*req_fields)
 	return render_to_pdf('hod_template/pdf.html',
 	{
 		'record':rec,
@@ -541,7 +566,8 @@ def res_print_form(request):
 
 def gen_pdf_iqac(request):
 	req_fields = request.POST.getlist('fields[]')
-	rec = committee_and_board.objects.values(*req_fields)
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	rec = committee_and_board.objects.filter(institute_to_belong=admin_obj.institute_to_belong).values(*req_fields)
 	return render_to_pdf('hod_template/pdf.html',
 	{
 		'record':rec,
@@ -551,7 +577,8 @@ def iqac_print_form(request):
 	return render(request,'hod_template/iqac_print_form.html')
 
 def ta_details(request):
-	ta_det = ta.objects.all()
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	ta_det = ta.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
 	context ={
 		'ta_det':ta_det,
 	}
@@ -562,7 +589,8 @@ def ta_print_form(request):
 
 def gen_pdf_ta(request):
 	req_fields = request.POST.getlist('fields[]')
-	rec = ta.objects.values(*req_fields)
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	rec = ta.objects.filter(institute_to_belong=admin_obj.institute_to_belong).values(*req_fields)
 	return render_to_pdf('hod_template/pdf.html',
 	{
 		'record':rec,
@@ -580,8 +608,131 @@ def search_student(request):
 		keyword.append(" ")
 	if count == 1:
 		keyword.append(" ") """
-	rec = Students.objects.filter(admin__first_name__contains = keyword)
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	rec = Students.objects.filter(admin__first_name__contains = keyword,institute_to_belong=admin_obj.institute_to_belong)
 	context = {
 		"students": rec
 	}
 	return render(request, 'hod_template/manage_student_template.html', context)
+
+def search_staff(request):
+	keyword = request.POST.get("table_search")
+	""" count = 0
+	print(keyword)
+	for i in keyword:
+		count = count + 1
+		print(i)
+	if count == 0:
+		keyword.append(" ")
+		keyword.append(" ")
+	if count == 1:
+		keyword.append(" ") """
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	rec = Staffs.objects.filter(admin__first_name__contains = keyword,institute_to_belong=admin_obj.institute_to_belong)
+	context = {
+		"staffs": rec
+	}
+	return render(request, 'hod_template/manage_staff_template.html', context)
+
+def edit_inst(request):
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	inst_det = institute_details.objects.get(id = admin_obj.institute_to_belong.id)
+	context = {
+		"inst_det":inst_det,
+	}
+	return render(request,'hod_template/edit_institute.html',context)
+
+def edit_inst_save(request):
+	if request.method != "POST":
+		messages.error(request, "Invalid Method")
+		return redirect('edit_inst')
+	else:
+		name = request.POST.get('name')
+		address = request.POST.get('address')
+		city = request.POST.get('city')
+		state = request.POST.get('state')
+		pin = request.POST.get('pin')
+		website = request.POST.get('website')
+		area = request.POST.get('area')
+		builtup_area = request.POST.get('builtup_area')
+		recognition_date = request.POST.get('recognition_date')
+		campus_type = request.POST.get('campus_type')
+		institute_type = request.POST.get('institute_type')
+		institute_nature = request.POST.get('institute_nature')
+		establishment_date = request.POST.get('establishment_date')
+		mail_prefix = request.POST.get('mail_prefix')
+		
+		if not recognition_date or not establishment_date: 
+			messages.error(request, "Please fill all details!")
+			return redirect('edit_inst')
+		
+		if establishment_date > datetime.now().date().strftime("%Y-%m-%d") or recognition_date > datetime.now().date().strftime("%Y-%m-%d"):
+			messages.error(request, "Recognition and Establishment Dates should be before current date!")
+			return redirect('edit_inst')
+
+		admin_obj = AdminHOD.objects.get(admin=request.user.id)
+		#inst_det = institute_details.objects.get(id = admin_obj.institute_to_belong.id)
+		try:
+			inst_det = institute_details.objects.get(id = admin_obj.institute_to_belong.id)
+			
+			inst_det.name = name
+			inst_det.address = address
+			inst_det.city = city
+			
+			#inst_det.state = state
+			inst_det.pin = pin
+			inst_det.website = website
+			
+			inst_det.area = area
+			inst_det.builtup_area = builtup_area
+			inst_det.recognition_date = datetime.strptime(recognition_date,"%Y-%m-%d").date()
+			
+			inst_det.campus_type = campus_type
+			
+			inst_det.institute_nature = institute_nature
+			
+			inst_det.establishment_date = datetime.strptime(establishment_date,"%Y-%m-%d").date()
+			#inst_det.mail_prefix = mail_prefix
+			
+			inst_det.save()
+
+			messages.success(request, "Details uploaded successfully.")
+			return redirect('edit_inst')
+		except:
+			messages.error(request, "Failed to upload details.")
+			return redirect('edit_inst')
+
+def view_expense(request):
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	curr_date = datetime.now().date().strftime("%Y")
+	new_rec = expense_details.objects.update_or_create(fiscal_year=int(curr_date),institute_to_belong = admin_obj.institute_to_belong,defaults={'institute_to_belong':admin_obj.institute_to_belong,'fiscal_year':int(curr_date)})
+	exp_det = expense_details.objects.filter(institute_to_belong = admin_obj.institute_to_belong)
+	context = {
+		'expense':exp_det,
+	}
+	return render(request,'hod_template/manage_expense.html',context)
+
+def add_expense_save(request):
+	if request.method != "POST":
+		messages.error(request, "Invalid Method")
+		return redirect('view_expense')
+	else:
+		amt = request.POST.get('amt')
+
+		if int(amt) <= 0:
+			messages.error(request, "Expense must be non-zero positive value!")
+			return redirect('view_expense')
+
+		admin_obj = AdminHOD.objects.get(admin=request.user.id)
+		curr_date = datetime.now().date().strftime("%Y")
+		
+		try:
+			exp_det = expense_details.objects.filter(fiscal_year = int(curr_date),institute_to_belong = admin_obj.institute_to_belong).last()
+	
+			exp_det.total_expense += int(amt)
+			exp_det.save()
+			messages.success(request, "Expense added Successfully!")
+			return redirect('view_expense')
+		except:
+			messages.error(request, "Failed to add expense.")
+			return redirect('view_expense')

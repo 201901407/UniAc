@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 import datetime
-from .models import CustomUser, Staffs, Students, ta
+from .models import CustomUser, Staffs, Students, ta,institute_details
 
 def student_home(request):
 	user = CustomUser.objects.get(id=request.user.id)
@@ -84,12 +84,13 @@ def grad_student_fill_acc_save(request):
 		yor = request.POST.get('yor')
 		sel = request.POST.get('sel')
 		stud_obj = Students.objects.get(admin=request.user.id)
-		
+		#inst_obj = institute_details.objects.get(id=stud_obj.institute_to_belong)
 		print(stud_obj.admin)
 		try:
 			op = ta.objects.filter(student_id = stud_obj.id).first()
 			if not op:
 				kyle = ta()
+				guide = Staffs.objects.get(id=temp)
 				#print("hello")
 				kyle.name = name
 				kyle.guide = guide
@@ -97,6 +98,7 @@ def grad_student_fill_acc_save(request):
 				kyle.year_of_registration = yor
 				kyle.student_id = stud_obj
 				kyle.type = sel
+				kyle.institute_to_belong = stud_obj.institute_to_belong
 				#print("hello")
 				kyle.save()
 			else:

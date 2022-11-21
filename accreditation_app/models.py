@@ -19,7 +19,7 @@ class CustomUser(AbstractUser):
 		'student': STUDENT
 	}
 
-	user_type_data = ((HOD, "HOD"), (STAFF, "Staff"), (STUDENT, "Student"))
+	user_type_data = ((HOD, "hod"), (STAFF, "staff"), (STUDENT, "student"))
 	user_type = models.CharField(default=1, choices=user_type_data, max_length=10)
 
 class institute_details(models.Model):
@@ -29,7 +29,7 @@ class institute_details(models.Model):
 	city = models.TextField(default="")
 	state = models.TextField(default="")
 	pin = models.BigIntegerField(default=0)
-	website = models.CharField(max_length=400,default="")
+	website = models.URLField(max_length=400,default="")
 	area = models.BigIntegerField(default=0)
 	builtup_area = models.BigIntegerField(default=0)
 	recognition_date = models.DateField(default=datetime.date.today)
@@ -68,7 +68,7 @@ class Staffs(models.Model):
 class Students(models.Model):
 	id = models.AutoField(primary_key=True)
 	admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
-	gender = models.CharField(max_length=50,default="")
+	gender = models.TextField(max_length=50,default="")
 	profile_pic = models.FileField(upload_to='images/',null=True)
 	address = models.TextField(default="")
 	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
@@ -84,6 +84,7 @@ class ta(models.Model):
 	name = models.TextField(max_length=255)
 	guide = models.ForeignKey(Staffs,on_delete=models.CASCADE,default=1)
 	area_of_work = models.TextField(max_length=1000)
+	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	year_of_registration = models.IntegerField(validators=[MinValueValidator(2002),MaxValueValidator(datetime.date.today().year)])
 	type = models.CharField(max_length=255)
 	objects = models.Manager()
@@ -98,24 +99,24 @@ def create_user_profile(sender, instance, created, **kwargs):
 	if created:
 	
 		# Check the user_type and insert the data in respective tables
-		if instance.user_type == 1:
+		if instance.user_type == "hod":
 			AdminHOD.objects.create(admin=instance)
-		if instance.user_type == 2:
+		if instance.user_type == "staff":
 			Staffs.objects.create(admin=instance)
-		if instance.user_type == 3:
+		if instance.user_type == "student":
 			Students.objects.create(admin=instance,
 									address="",
 									profile_pic="",
-									gender="Male",institute_to_belong=instance.inst_obj)
+									gender="")
 	
 
 @receiver(post_save, sender=CustomUser)
 def save_user_profile(sender, instance, **kwargs):
-	if instance.user_type == 1:
+	if instance.user_type == "hod":
 		instance.adminhod.save()
-	if instance.user_type == 2:
+	if instance.user_type == "staff":
 		instance.staffs.save()
-	if instance.user_type == 3:
+	if instance.user_type == "student":
 		instance.students.save()
 
 class research_area(models.Model):
@@ -134,3 +135,9 @@ class committee_and_board(models.Model):
 	address = models.CharField(max_length=600)
 	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	committee = models.CharField(max_length=255)
+
+class expense_details(models.Model):
+	id = models.AutoField(primary_key=True)
+	fiscal_year = models.IntegerField(default=0)
+	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
+	total_expense = models.BigIntegerField(default=0)

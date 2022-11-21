@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-f=94re$@7pmo=3amh93x6%((5qqr0^7ux^=g*vtb_g)03#8s(('
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'accreditation_app',
 ]
 
+AUTH_USER_MODEL = 'accreditation_app.CustomUser'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -50,7 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'accreditation_app.middleware.LoginRequiredMiddleware'
+    'accreditation_app.middleware.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'accreditation_system.urls'
@@ -131,6 +133,6 @@ STATIC_ROOT=os.path.join(BASE_DIR,"static")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'accreditation_app.CustomUser'
-AUTH_EXEMPT_ROUTES = ('admin/', 'home', 'contact','login','registration','doLogin','doRegistration','inreg','doInstReg')
+
+AUTH_EXEMPT_ROUTES = ('admin', 'home', 'contact','login','registration','doLogin','doRegistration','inreg','doInstReg')
 AUTH_LOGIN_ROUTE = 'login'

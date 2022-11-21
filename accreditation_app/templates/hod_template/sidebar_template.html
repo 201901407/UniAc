@@ -35,6 +35,17 @@
             </li>
 
             <li class="nav-item">
+              {% url 'edit_inst' as edit_inst %}
+      
+              <a href="{{ edit_inst }}" class="nav-link {% if request.path == edit_inst %} active {% endif %}">
+                <i class="nav-icon fas fa-university"></i>
+                <p>
+                  Manage Institute
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
               {% url 'manage_staff' as manage_staff %}
               {% url 'edit_staff' staff_id=id as edit_staff %}
               <a href="{{ manage_staff }}" class="nav-link {% if request.path == manage_staff %} active {% endif %} {% if request.path == edit_staff %} active {% endif %}">
@@ -93,7 +104,7 @@
             <li class="nav-item">
               {% url 'res_proj_details' as proj_res_details %}
               <a href="{{ proj_res_details }}" class="nav-link {% if request.path == proj_res_details %} active {% endif %}">
-                <i class="nav-icon fas fa-calendar-alt"></i>
+                <i class="nav-icon fas fa-rocket"></i>
                 <p>
                   View Research Projects
                 </p>
@@ -103,13 +114,22 @@
             <li class="nav-item">
               {% url 'add_comb' as add_comb %}
               <a href="{{ add_comb }}" class="nav-link {% if request.path == add_comb %} active {% endif %}">
-                <i class="nav-icon fas fa-calendar-alt"></i>
+                <i class="nav-icon fas fa-user-friends"></i>
                 <p>
                   View Committee members
                 </p>
               </a>
             </li>
 
+            <li class="nav-item">
+              {% url 'view_expense' as view_expense %}
+              <a href="{{ view_expense }}" class="nav-link {% if request.path == view_expense %} active {% endif %}">
+                <i class="nav-icon fas fa-money-check-alt"></i>
+                <p>
+                  Manage Expenses
+                </p>
+              </a>
+            </li>
             
           </ul>
         </nav>

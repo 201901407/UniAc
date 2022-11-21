@@ -1,7 +1,7 @@
 {% extends 'hod_template/base_template.html' %}
 
 {% block page_title %}
-    Edit Staff | Username: {{ staff.admin.username }} | #ID : {{ staff.admin.id }}
+    Edit Institute Details
 {% endblock page_title %}
 
 {% block main_content %}
@@ -16,11 +16,11 @@
                     <!-- general form elements -->
                     <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Edit Staff</h3>
+                        <h3 class="card-title">Edit Institute Details</h3>
                     </div>
                     <!-- /.card-header -->
                     <!-- form start -->
-                    <form role="form" method="POST" action="{% url 'edit_staff_save' staff.admin.id %}">
+                    <form role="form" method="POST" action="{% url 'edit_inst_save' %}">
                         {% csrf_token %}
 
                         
@@ -53,65 +53,71 @@
                         <div class="card-body">
                             
                             <div class="form-group">
-                                <label>Username</label>
-                                <input type="text" class="form-control" name="username" value="{{ staff.admin.username }}" required>
+                                <label>Name</label>
+                                <input type="text" class="form-control" name="name" value="{{ inst_det.name }}">
                             </div>
 
                             <div class="form-group">
-                                <label>First Name</label>
-                                <input type="text" class="form-control" name="first_name" value="{{ staff.admin.first_name }}" required>
+                                <label>Address</label>
+                                <input type="text" class="form-control" name="address" value="{{ inst_det.address }}">
                             </div>
 
                             <div class="form-group">
-                                <label>Last Name</label>
-                                <input type="text" class="form-control" name="last_name" value="{{ staff.admin.last_name }}" required>
+                                <label>City</label>
+                                <input type="text" class="form-control" name="city" value="{{ inst_det.city }}">
                             </div>
 
                             <div class="form-group">
-                                <label>Qualifications</label>
-                                <select name="quali" class="form-control" required>
-                                    <option value="{{ staff.qualifications }}" selected disabled hidden>{{ staff.qualifications }}</option>
-                                    <option value="Bachelor of Technology">Bachelor of Technology</option>
-                                    <option value="Bachelor of Science">Bachelor of Science</option>
-                                    <option value="Master of Technology">Master of Technology</option>
-                                    <option value="Master of Science">Master of Science</option>
-                                    <option value="Doctor of Philosophy">Doctor of Philosophy</option>
-                                </select>
+                                <label>State</label>
+                                <input type="text" class="form-control" name="state" value="{{ inst_det.state }}" >
                             </div>
                             <div class="form-group">
-                                <label>Designation</label>
-                                <select name="des" class="form-control" required>
-                                    <option value="{{ staff.designation }}" selected disabled hidden>{{ staff.designation }}</option>
-                                    <option value="Lecturer">Lecturer</option>
-                                    <option value="Assistant Professor">Assistant Professor</option>
-                                    <option value="Associate Professor">Associate Professor</option>
-                                    <option value="Visiting Professor">Visiting Professor</option>
-                                </select>
+                                <label>Pin</label>
+                                <input type="number" class="form-control" name="pin" value="{{ inst_det.pin }}">
                             </div>
                             <div class="form-group">
-                                <label>Area Of Specialisation</label>
-                                <input type="text" name="area" class="form-control" value={{ staff.area_of_specialisation }}>
+                                <label>Website</label>
+                                <input type="url" name="website" class="form-control" value="{{ inst_det.website }}">
                             </div>
                             <div class="form-group">
-                                <label>Experience (in years)</label>
-                                <input type="number" name="exp" class="form-control" value= "{{ staff.experience }}">
+                                <label>Area (in sq. meters)</label>
+                                <input type="number" name="area" class="form-control" value= "{{ inst_det.area }}">
                             </div>
                             <div class="form-group">
-                                <label>Number Of Doctorate Students Guided</label>
-                                <input type="number" name="doct" class="form-control" value="{{ staff.number_of_doctorate_students_guided }}">
+                                <label>Builtup Area (in sq. meters)</label>
+                                <input type="number" name="builtup_area" class="form-control" value="{{ inst_det.builtup_area }}">
                             </div>
                             <div class="form-group">
-                                <label>Number Of Graduate Students Guided</label>
-                                <input type="number" name="grad" class="form-control" value="{{ staff.number_of_graduate_students_guided }}">
+                                <label>Recognition Date</label>
+                                <input type="date" name="recognition_date" class="form-control" value="{{ inst_det.recognition_date }}">
                             </div>
-                            
+                            <div class="form-group">
+                                <label>Campus Type</label>
+                                <input type="text" name="campus_type" class="form-control" value="{{ inst_det.campus_type }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Institute Type</label>
+                                <input type="text" name="institute_type" class="form-control" value="{{ inst_det.institute_type }}" >
+                            </div>
+                            <div class="form-group">
+                                <label>Institute Nature</label>
+                                <input type="text" name="institute_nature" class="form-control" value="{{ inst_det.institute_nature }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Establishment Date</label>
+                                <input type="date" name="establishment_date" class="form-control" value="{{ inst_det.establishment_date }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Mail Prefix</label>
+                                <input type="text" name="mail_prefix" class="form-control" value="{{ inst_det.mail_prefix }}">
+                            </div>
 
 
                         </div>
                         <!-- /.card-body -->
 
                         <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">Update Staff</button>
+                        <button type="submit" class="btn btn-primary">Update!</button>
                         </div>
                     </form>
                     </div>

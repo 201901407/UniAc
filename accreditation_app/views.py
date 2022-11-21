@@ -27,13 +27,15 @@ def doLogin(request):
 		messages.error(request, "Please provide all the details!!")
 		return render(request, 'login_page.html')
 
-	user = CustomUser.objects.filter(email=email_id, password=password).last()
-	if not user:
+	user = CustomUser.objects.filter(email=email_id,password=password).last()
+	op = CustomUser.objects.filter(email=email_id).last()
+	if not user and not op.check_password(password):
 		messages.error(request, 'Invalid Login Credentials!!')
 		return render(request, 'login_page.html')
 
 	login(request, user)
 	print(request.user)
+	print(user.user_type)
 
 	if user.user_type == "student":
 		return redirect('student_home/')
@@ -92,22 +94,23 @@ def doRegistration(request):
 
 	username = email_id.split('@')[0]
 
-	user = CustomUser()
-	user.username = username
-	user.email = email_id
-	user.password = password
-	user.user_type = user_type
-	user.first_name = first_name
-	user.last_name = last_name
-	user.save()
+	user = CustomUser.objects.create(
+	username = username,
+	email = email_id,
+	password = password,
+	user_type = user_type,
+	first_name = first_name,
+	last_name = last_name,
+	)
 
+	user_obj = CustomUser.objects.get(email=email_id)
 	if user_type == "staff":
-		Staffs.objects.create(admin=user,name = first_name+" "+last_name,institute_to_belong = inst_obj)
+		Staffs.objects.update_or_create(admin=user_obj,defaults={'institute_to_belong':inst_obj,'name':first_name+" "+last_name})
 	elif user_type == "student":
-		Students.objects.create(admin=user,institute_to_belong = inst_obj)
+		Students.objects.update_or_create(admin=user_obj,defaults={'institute_to_belong':inst_obj})
 		print("boom")
 	elif user_type == "hod":
-		AdminHOD.objects.create(admin=user,institute_to_belong = inst_obj)
+		AdminHOD.objects.update_or_create(admin=user_obj,defaults={'institute_to_belong':inst_obj})
 	return render(request, 'login_page.html')
 
 	
