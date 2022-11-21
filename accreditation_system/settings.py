@@ -133,12 +133,6 @@ STATIC_ROOT=os.path.join(BASE_DIR,"static")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-<<<<<<< HEAD
-
-AUTH_EXEMPT_ROUTES = ('admin', 'home', 'contact','login','registration','doLogin','doRegistration','inreg','doInstReg')
-AUTH_LOGIN_ROUTE = 'login'
-=======
 AUTH_USER_MODEL = 'accreditation_app.CustomUser'
 AUTH_EXEMPT_ROUTES = ('admin/', 'home', 'contact','login','registration','doLogin','doRegistration','inreg','doInstReg')
 AUTH_LOGIN_ROUTE = 'login'
->>>>>>> 44586bdab4c4f68d05dc086ec0aed68b57664bb5
