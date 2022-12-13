@@ -1,0 +1,111 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Edit Expense
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- general form elements -->
+                    <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Edit Expense Record</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <form role="form" method="POST" action="{% url 'edit_expense_save' row.id %}">
+                        {% csrf_token %}
+
+                        
+                                {% comment %} Display Messages {% endcomment %}
+                                {% if messages %}
+                                <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                    {% if message.tags == "error" %}
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                    {% elif message.tags == "success" %}
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                </div>
+                                {% endif %}
+                            
+
+                        <div class="card-body">
+                            
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>Vendor Name</label>
+                                <input type="text" name="vendor" class="form-control" value={{ row.vendor }} required></div>
+                                <div class="form-group">
+                                    <label>GST Number of the Vendor (15 digits)</label>
+                                <input type="text" minlength="15" maxlength="15" name="gstnum" class="form-control" value={{ row.gstnum }} required></div>
+                                <div class="form-group">
+                                    <label>Product Details/Purpose</label>
+                                <input type="text" minlength="1" maxlength="100" name="purpose" class="form-control" value={{ row.purpose }} required></div>
+                                <div class="form-group">
+                                    <label>Units of the product (if applicable)</label>
+                                <input type="number" name="units" class="form-control" value={{ row.units }} required></div>
+                                <div class="form-group">
+                                    <label>Price of product per unit (if applicable)</label>
+                                <input type="number" name="price_per_unit" class="form-control" value={{ row.price_per_unit }} required></div>
+                                <div class="form-group">
+                                    <label>Ordering Entity</label>
+                                    <select name="ordering_person" class="form-control " style=" width: 100%;" required>
+                                        <option value="{{ row.ordering_person }}" selected disabled hidden>{{ row.ordering_person.name }}</option>
+                                    {% for i in all_fac %}
+                                    <option value={{ i.id }} style="color: black;">{{i.name}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Payment Mode</label>
+                                <select name="paymode" class="form-control " style=" width: 100%;" required>
+                                    <option value="{{ row.paymode }}" selected disabled hidden>{{ row.paymode }}</option>
+                                  <option value="Cash" style="color: black;">Cash</option>
+                                  <option value="Cheque" style="color: black;">Cheque</option>
+                              </select>
+                              </div>
+                                <div class="form-group">
+                                    <label>Cheque Number (if applicable)</label>
+                                <input type="number" minlength="2" maxlength="20" name="cheque_number" value={{ row.cheque_number }} class="form-control" required></div>
+                            </div>
+                            
+
+
+                        </div>
+                        <!-- /.card-body -->
+
+                        <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Update Staff</button>
+                        </div>
+                    </form>
+                    </div>
+                    <!-- /.card -->
+
+                </div>
+            </div>
+
+        </div><!-- /.container-fluid -->
+      </section>
+
+  {% endblock main_content %}

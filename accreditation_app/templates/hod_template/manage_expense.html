@@ -47,11 +47,39 @@
                 <form method="POST" action="{% url 'add_expense_save' %}">
                     {% csrf_token %}
                     <div class="card-body">
-                       
                         <div class="form-group">
-                            <label>Amount</label>
-                            <input type="number" name="amt" class="form-control" required></div>
-                        
+                            <label>Vendor Name</label>
+                        <input type="text" name="vendor" class="form-control" required></div>
+                        <div class="form-group">
+                            <label>GST Number of the Vendor (15 digits)</label>
+                        <input type="text" minlength="15" maxlength="15" name="gstnum" class="form-control" required></div>
+                        <div class="form-group">
+                            <label>Product Details/Purpose</label>
+                        <input type="text" minlength="1" maxlength="100" name="purpose" class="form-control" required></div>
+                        <div class="form-group">
+                            <label>Units of the product (if applicable)</label>
+                        <input type="number" name="units" class="form-control" required></div>
+                        <div class="form-group">
+                            <label>Price of product per unit (if applicable)</label>
+                        <input type="number" name="price_per_unit" class="form-control" required></div>
+                        <div class="form-group">
+                            <label>Ordering Entity</label>
+                            <select name="ordering_person" class="form-control " style=" width: 100%;" required>
+                            {% for i in all_fac %}
+                            <option value={{ i.id }} style="color: black;">{{i.name}}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Payment Mode</label>
+                        <select name="paymode" class="form-control " style=" width: 100%;" required>
+                          <option value="Cash" style="color: black;">Cash</option>
+                          <option value="Cheque" style="color: black;">Cheque</option>
+                      </select>
+                      </div>
+                        <div class="form-group">
+                            <label>Cheque Number (if applicable)</label>
+                        <input type="number" minlength="2" maxlength="20" name="cheque_number" class="form-control" required></div>
                     </div>
                     <!-- /.card-body -->
 
@@ -81,16 +109,37 @@
 								<thead class="thead-light">
 								<tr>
 									<th>Sr. no.</th>
+                                    <th>Vendor</th>
+                                    <th>GST Number</th>
+                                    <th>Purpose</th>
+                                    <th>Units</th>
+                                    <th>Price per unit</th>
+                                    <th>Ordering Entity</th>
+                                    <th>Payment Mode</th>
+                                    <th>Cheque Number</th>
 									<th>Fiscal Year</th>
 									<th>Total Expense</th>
+                                    <th>Action</th>
 								</tr>
 								</thead>
 								
 								{% for row in expense %}
 								<tr>
 									<td>{{ row.id }}</td>
+                                    <td>{{ row.vendor }}</td>
+                                    <td>{{ row.gstnum }}</td>
+                                    <td>{{ row.purpose }}</td>
+                                    <td>{{ row.units }}</td>
+                                    <td>{{ row.price_per_unit }}</td>
+                                    <td>{{ row.ordering_person.name }}</td>
+                                    <td>{{ row.paymode }}</td>
+                                    <td>{{ row.cheque_number }}</td>
 									<td>{{ row.fiscal_year }}</td>
 									<td>{{ row.total_expense }}</td>
+                                    <td>
+                                        <a href="{% url 'edit_expense' row.id %}" class="btn btn-success">Edit</a> 
+                                        <a href="{% url 'delete_expense' row.id %}" class="btn btn-danger">Delete</a>
+                                    </td>
 								</tr>
 								{% endfor %}
 							</table>

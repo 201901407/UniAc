@@ -10,11 +10,12 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import get_template
 from xhtml2pdf import pisa
+from django.db.models import Sum
 import json
 
 from .forms import AddStudentForm, EditStudentForm
 
-from .models import CustomUser, Staffs, Students, committee_and_board, research_area,ta,AdminHOD,institute_details,expense_details
+from .models import CustomUser, Staffs, Students, committee_and_board, research_area,ta,AdminHOD,institute_details,expenditure_details
 
 
 def admin_home(request):
@@ -36,12 +37,22 @@ def admin_home(request):
 	for student in students:
 		student_name_list.append(student.admin.first_name)
 
+	exp_det_year = []
+	exp_det = []
+	y_exp = expenditure_details.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
+	op_exp = y_exp.values('total_expense','fiscal_year').annotate(dcount = Sum('total_expense')).order_by()
+	for i in op_exp:
+		exp_det_year.append(i['fiscal_year'])
+		exp_det.append((i['dcount']))
+	print(op_exp)
 
 	context={
 		"all_student_count": all_student_count,
 		"staff_count": staff_count,
 		"staff_name_list": staff_name_list,
 		"student_name_list": student_name_list,
+		"exp_det_year":exp_det_year,
+		"exp_det":exp_det,
 	}
 	return render(request, "hod_template/home_content.html", context)
 
@@ -386,7 +397,6 @@ def check_username_exist(request):
 
 def admin_profile(request):
 	user = CustomUser.objects.get(id=request.user.id)
-
 	context={
 		"user": user
 	}
@@ -407,12 +417,12 @@ def admin_profile_update(request):
 			customuser.first_name = first_name
 			customuser.last_name = last_name
 			if password != None and password != "":
-				customuser.set_password(password)
+				customuser.password = password
 			customuser.save()
-			messages.success(request, "Profile Updated Successfully")
+			messages.success(request, "Profile Updated Successfully!")
 			return redirect('admin_profile')
 		except:
-			messages.error(request, "Failed to Update Profile")
+			messages.error(request, "Failed to Update Profile!")
 			return redirect('admin_profile')
 	
 
@@ -446,6 +456,7 @@ def add_research_project_save(request):
 			spron_auth=spron_auth,
 			cost=cost,
 			year_completed=yc,
+			institute_to_belong = admin_obj.institute_to_belong,
 		)
 		if op:
 			messages.error(request, "This Project already exists.")
@@ -704,11 +715,11 @@ def edit_inst_save(request):
 
 def view_expense(request):
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	curr_date = datetime.now().date().strftime("%Y")
-	new_rec = expense_details.objects.update_or_create(fiscal_year=int(curr_date),institute_to_belong = admin_obj.institute_to_belong,defaults={'institute_to_belong':admin_obj.institute_to_belong,'fiscal_year':int(curr_date)})
-	exp_det = expense_details.objects.filter(institute_to_belong = admin_obj.institute_to_belong)
+	exp_det = expenditure_details.objects.filter(institute_to_belong = admin_obj.institute_to_belong)
+	all_fac = Staffs.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
 	context = {
 		'expense':exp_det,
+		'all_fac':all_fac,
 	}
 	return render(request,'hod_template/manage_expense.html',context)
 
@@ -717,22 +728,121 @@ def add_expense_save(request):
 		messages.error(request, "Invalid Method")
 		return redirect('view_expense')
 	else:
-		amt = request.POST.get('amt')
+		vendor = request.POST.get('vendor')
+		gstnum = request.POST.get('gstnum')
+		purpose = request.POST.get('purpose')
+		unit = request.POST.get('units')
+		ppu = request.POST.get('price_per_unit')
+		op = request.POST.get('ordering_person')
+		pm = request.POST.get('paymode')
+		cn = request.POST.get('cheque_number')
 
-		if int(amt) <= 0:
-			messages.error(request, "Expense must be non-zero positive value!")
+		if int(ppu) <= 0:
+			messages.error(request, "Price must be non-zero positive value!")
 			return redirect('view_expense')
+		
+		if int(unit) <= 0:
+			messages.error(request, "Number of Units must be non-zero positive value!")
+			return redirect('view_expense')
+		
+		admin_obj = AdminHOD.objects.get(admin=request.user.id)
+		curr_date = datetime.now().date().strftime("%Y")
+		try:
+			kop = Staffs.objects.filter(id=op).first()
+			print(kop.name)
+			exp_det = expenditure_details.objects.update_or_create(
+				vendor = vendor,
+				gstnum = gstnum,
+				fiscal_year = int(curr_date),
+				units = int(unit),
+				purpose = purpose,
+				price_per_unit = int(ppu),
+				ordering_person = kop,
+				paymode = pm,
+				cheque_number = cn,
+				institute_to_belong = admin_obj.institute_to_belong,
+				total_expense = int(unit)*int(ppu),
+			)
+
+			#exp_det.save()
+			messages.success(request, "Expense Record added Successfully!")
+			return redirect('view_expense')
+		except:
+			messages.error(request, "Failed to add expense record.")
+			return redirect('view_expense')
+
+def edit_expense(request,expense_id):
+	exp_obj = expenditure_details.objects.filter(id=expense_id).first()
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	all_fac = Staffs.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
+	context = {
+		'row':exp_obj,
+		'all_fac':all_fac,
+	}
+	return render(request,'hod_template/edit_expense.html',context)
+
+def edit_expense_save(request,expense_id):
+	if request.method != "POST":
+		messages.error(request, "Invalid Method")
+		return redirect('/edit_expense/'+expense_id)
+	else:
+		vendor = request.POST.get('vendor')
+		gstnum = request.POST.get('gstnum')
+		purpose = request.POST.get('purpose')
+		unit = request.POST.get('units')
+		ppu = request.POST.get('price_per_unit')
+		op = request.POST.get('ordering_person')
+		pm = request.POST.get('paymode')
+		cn = request.POST.get('cheque_number')
+
+		if int(ppu) <= 0:
+			messages.error(request, "Price must be non-zero positive value!")
+			return redirect('view_expense')
+		
+		if int(unit) <= 0:
+			messages.error(request, "Number of Units must be non-zero positive value!")
+			return redirect('view_expense')
+		
+		if pm is None:
+			temp = expenditure_details.objects.filter(id=expense_id).first()
+			pm = temp.paymode
+		
+		if op is None:
+			temp = expenditure_details.objects.filter(id=expense_id).first()
+			op = temp.ordering_person.id
 
 		admin_obj = AdminHOD.objects.get(admin=request.user.id)
 		curr_date = datetime.now().date().strftime("%Y")
-		
 		try:
-			exp_det = expense_details.objects.filter(fiscal_year = int(curr_date),institute_to_belong = admin_obj.institute_to_belong).last()
+			kop = Staffs.objects.filter(id=op).first()
 	
-			exp_det.total_expense += int(amt)
-			exp_det.save()
-			messages.success(request, "Expense added Successfully!")
-			return redirect('view_expense')
+			exp_det = expenditure_details.objects.update_or_create(
+				id = expense_id,defaults={
+				'vendor':vendor,
+				'gstnum': gstnum,
+				'units' : int(unit),
+				'purpose' : purpose,
+				'price_per_unit' : int(ppu),
+				'ordering_person' : kop,
+				'paymode' : pm,
+				'cheque_number' : cn,
+				'total_expense' : int(unit)*int(ppu),
+				}
+			)
+			
+			#exp_det.save()
+			messages.success(request, "Expense Record updated Successfully!")
+			return redirect('/edit_expense/'+expense_id)
 		except:
-			messages.error(request, "Failed to add expense.")
-			return redirect('view_expense')
+			messages.error(request, "Failed to update expense record.")
+			return redirect('/edit_expense/'+expense_id)
+
+def delete_expense(request,expense_id):
+	exp_det = expenditure_details.objects.get(id=expense_id)
+	try:
+		exp_det.delete()
+		messages.success(request, "Expense record Deleted Successfully.")
+		return redirect('view_expense')
+	except:
+		messages.error(request, "Failed to Delete the record.")
+		return redirect('view_expense')

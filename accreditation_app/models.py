@@ -136,8 +136,16 @@ class committee_and_board(models.Model):
 	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	committee = models.CharField(max_length=255)
 
-class expense_details(models.Model):
+class expenditure_details(models.Model):
 	id = models.AutoField(primary_key=True)
+	vendor = models.TextField(default="")
+	gstnum = models.TextField(default="",max_length=15)
 	fiscal_year = models.IntegerField(default=0)
+	units = models.BigIntegerField(default=0)
+	purpose = models.TextField(default="")
+	price_per_unit = models.BigIntegerField(default=0)
+	ordering_person = models.ForeignKey(Staffs,on_delete=models.CASCADE,default=1)
+	paymode = models.TextField(default="")
+	cheque_number = models.TextField(default="")
 	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	total_expense = models.BigIntegerField(default=0)

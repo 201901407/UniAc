@@ -70,4 +70,7 @@ urlpatterns = [
 	path('edit_inst_save/',HodViews.edit_inst_save,name="edit_inst_save"),
 	path('view_expense/',HodViews.view_expense,name="view_expense"),
 	path('add_expense_save/',HodViews.add_expense_save,name="add_expense_save"),
+	path('edit_expense/<expense_id>/',HodViews.edit_expense,name="edit_expense"),
+	path('delete_expense/<expense_id>/',HodViews.delete_expense,name="delete_expense"),
+	path('edit_expense_save/<expense_id>/',HodViews.edit_expense_save,name="edit_expense_save"),
 ]+ static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)
