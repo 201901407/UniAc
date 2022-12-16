@@ -1,7 +1,7 @@
 {% extends 'hod_template/base_template.html' %}
 
 {% block page_title %}
-    Edit Expense
+    Edit Revenue
 {% endblock page_title %}
 
 {% block main_content %}
@@ -16,11 +16,11 @@
                     <!-- general form elements -->
                     <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Edit Expense Record</h3>
+                        <h3 class="card-title">Edit Revenue Record</h3>
                     </div>
                     <!-- /.card-header -->
                     <!-- form start -->
-                    <form role="form" method="POST" action="{% url 'edit_expense_save' row.id %}">
+                    <form role="form" method="POST" action="{% url 'edit_revenue_save' row.id %}">
                         {% csrf_token %}
 
                         
@@ -54,40 +54,37 @@
                             
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label>Vendor Name</label>
-                                <input type="text" name="vendor" class="form-control" value={{ row.vendor }} required></div>
-                                <div class="form-group">
-                                    <label>GST Number of the Vendor (15 digits)</label>
-                                <input type="text" minlength="15" maxlength="15" name="gstnum" class="form-control" value={{ row.gstnum }} required></div>
-                                <div class="form-group">
-                                    <label>Product Details/Purpose</label>
-                                <input type="text" minlength="1" maxlength="100" name="purpose" class="form-control" value={{ row.purpose }} required></div>
-                                <div class="form-group">
-                                    <label>Units of the product (if applicable)</label>
-                                <input type="number" name="units" class="form-control" value={{ row.units }} required></div>
-                                <div class="form-group">
-                                    <label>Price of product per unit (if applicable)</label>
-                                <input type="number" name="price_per_unit" class="form-control" value={{ row.price_per_unit }} required></div>
-                                <div class="form-group">
-                                    <label>Ordering Entity</label>
-                                    <select name="ordering_person" class="form-control " style=" width: 100%;" required>
-                                        <option value="{{ row.ordering_person }}" selected disabled hidden>{{ row.ordering_person.name }}</option>
-                                    {% for i in all_fac %}
-                                    <option value={{ i.id }} style="color: black;">{{i.name}}</option>
-                                    {% endfor %}
+                                    <label>Source</label>
+                                    <select name="source" class="form-control " style=" width: 100%;" required>
+                                        <option value="{{ row.source }}" selected disabled hidden>{{ row.source }}</option>
+                                        <option value="Student" style="color: black;">Student</option>
+                                        <option value="Sponsor" style="color: black;">Sponsor</option>
+                                        <option value="Research Grant" style="color: black;">Research Grant</option>
+                                        <option value="Development Grant" style="color: black;">Development Grant</option>
+                                        <option value="Alumini Donations" style="color: black;">Alumini Donations</option>
                                     </select>
-                                </div>
+                                    </div>
+                                    
+                                <div class="form-group">
+                                    <label>Purpose</label>
+                                <input type="text" minlength="1" maxlength="100" name="purpose" class="form-control" value={{ row.purpose }} required></div>
                                 <div class="form-group">
                                     <label>Payment Mode</label>
                                 <select name="paymode" class="form-control " style=" width: 100%;" required>
                                     <option value="{{ row.paymode }}" selected disabled hidden>{{ row.paymode }}</option>
                                   <option value="Cash" style="color: black;">Cash</option>
                                   <option value="Cheque" style="color: black;">Cheque</option>
+                                  <option value="Net banking" style="color: black;">Net banking</option>
+                                  <option value="Credit/Debit Cards" style="color: black;">Credit/Debit Cards</option>
+                                  <option value="UPI/Others" style="color: black;">UPI/Others</option>
                               </select>
                               </div>
                                 <div class="form-group">
                                     <label>Cheque Number (if applicable)</label>
-                                <input type="number" minlength="2" maxlength="20" name="cheque_number" value={{ row.cheque_number }} class="form-control" required></div>
+                                <input type="number" minlength="2" maxlength="20" name="cheque_number" class="form-control" value={{ row.cheque_number }} required></div>
+                                <div class="form-group">
+                                    <label>Revenue Obtained</label>
+                                <input type="number" minlength="2" maxlength="20" name="rvobt" class="form-control" value={{ row.total_revenue }} required></div>
                             </div>
                             
 

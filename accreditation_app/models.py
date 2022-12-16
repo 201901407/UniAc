@@ -135,6 +135,7 @@ class committee_and_board(models.Model):
 	address = models.CharField(max_length=600)
 	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	committee = models.CharField(max_length=255)
+	objects = models.Manager()
 
 class expenditure_details(models.Model):
 	id = models.AutoField(primary_key=True)
@@ -149,3 +150,15 @@ class expenditure_details(models.Model):
 	cheque_number = models.TextField(default="")
 	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	total_expense = models.BigIntegerField(default=0)
+	objects = models.Manager()
+
+class revenue_details(models.Model):
+	id = models.AutoField(primary_key=True)
+	source = models.TextField(default="")
+	fiscal_year = models.IntegerField(default=0)
+	purpose = models.TextField(default="")
+	paymode = models.TextField(default="")
+	cheque_number = models.TextField(default="")
+	total_revenue = models.BigIntegerField(default=0)
+	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
+	objects = models.Manager()

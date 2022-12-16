@@ -10,12 +10,12 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import get_template
 from xhtml2pdf import pisa
-from django.db.models import Sum
+from django.db.models import Count,Sum
 import json
 
 from .forms import AddStudentForm, EditStudentForm
 
-from .models import CustomUser, Staffs, Students, committee_and_board, research_area,ta,AdminHOD,institute_details,expenditure_details
+from .models import CustomUser, Staffs, Students, committee_and_board, research_area,ta,AdminHOD,institute_details,expenditure_details,revenue_details
 
 
 def admin_home(request):
@@ -40,12 +40,25 @@ def admin_home(request):
 	exp_det_year = []
 	exp_det = []
 	y_exp = expenditure_details.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
-	op_exp = y_exp.values('total_expense','fiscal_year').annotate(dcount = Sum('total_expense')).order_by()
+	op_exp = y_exp.values('fiscal_year').annotate(dcount = Sum('total_expense')).order_by()
+	
 	for i in op_exp:
 		exp_det_year.append(i['fiscal_year'])
 		exp_det.append((i['dcount']))
 	print(op_exp)
 
+	rev_det_year = []
+	rev_det = []
+	yr_exp = revenue_details.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
+	opr_exp = yr_exp.values('fiscal_year').annotate(dcount = Sum('total_revenue')).order_by()
+
+	for i in opr_exp:
+		rev_det_year.append(i['fiscal_year'])
+		rev_det.append((i['dcount']))
+	
+	pro_det = []
+	for i in range(len(rev_det)):
+		pro_det.append(rev_det[i]-exp_det[i])
 	context={
 		"all_student_count": all_student_count,
 		"staff_count": staff_count,
@@ -53,6 +66,9 @@ def admin_home(request):
 		"student_name_list": student_name_list,
 		"exp_det_year":exp_det_year,
 		"exp_det":exp_det,
+		"rev_det_year":rev_det_year,
+		"rev_det":rev_det,
+		"pro_det":pro_det,
 	}
 	return render(request, "hod_template/home_content.html", context)
 
@@ -546,13 +562,17 @@ def staff_print_form(request):
 
 def gen_pdf_student(request):
 	req_fields = request.POST.getlist('fields[]')
+	q_list = request.POST.getlist('genderq')
+	if len(q_list) == 0:
+		q_list.append("male")
+		q_list.append("female")
 	for f in req_fields:
 		if f is "adminname":
 			f = "admin.name"
 		elif f is "adminemail":
 			f = "admin.email"
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	rec = Students.objects.filter(institute_to_belong=admin_obj.institute_to_belong).values(*req_fields)
+	rec = Students.objects.filter(institute_to_belong=admin_obj.institute_to_belong,gender__in = q_list).values(*req_fields)
 	req_headers = request.POST.getlist('headers[]')
 	return render_to_pdf('hod_template/pdf.html',
 	{
@@ -797,11 +817,11 @@ def edit_expense_save(request,expense_id):
 
 		if int(ppu) <= 0:
 			messages.error(request, "Price must be non-zero positive value!")
-			return redirect('view_expense')
+			return redirect('/edit_expense/'+expense_id)
 		
 		if int(unit) <= 0:
 			messages.error(request, "Number of Units must be non-zero positive value!")
-			return redirect('view_expense')
+			return redirect('/edit_expense/'+expense_id)
 		
 		if pm is None:
 			temp = expenditure_details.objects.filter(id=expense_id).first()
@@ -846,3 +866,111 @@ def delete_expense(request,expense_id):
 	except:
 		messages.error(request, "Failed to Delete the record.")
 		return redirect('view_expense')
+
+
+def view_revenue(request):
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	exp_det = revenue_details.objects.filter(institute_to_belong = admin_obj.institute_to_belong)
+	context = {
+		'expense':exp_det,
+	}
+	return render(request,'hod_template/manage_revenue.html',context)
+
+
+def add_revenue_save(request):
+	if request.method != "POST":
+		messages.error(request, "Invalid Method")
+		return redirect('view_revenue')
+	else:
+		source = request.POST.get('source')
+		purpose = request.POST.get('purpose')
+		pm = request.POST.get('paymode')
+		cn = request.POST.get('cheque_number')
+		rvobt = request.POST.get('rvobt')
+
+		if int(rvobt) <= 0:
+			messages.error(request, "Price must be non-zero positive value!")
+			return redirect('view_revenue')
+		
+		admin_obj = AdminHOD.objects.get(admin=request.user.id)
+		curr_date = datetime.now().date().strftime("%Y")
+		try:
+			exp_det = revenue_details.objects.update_or_create(
+				source = source,
+				fiscal_year = int(curr_date),
+				purpose = purpose,
+				paymode = pm,
+				cheque_number = cn,
+				institute_to_belong = admin_obj.institute_to_belong,
+				total_revenue = int(rvobt),
+			)
+
+			#exp_det.save()
+			messages.success(request, "Revenue Record added Successfully!")
+			return redirect('view_revenue')
+		except:
+			messages.error(request, "Failed to add Revenue record.")
+			return redirect('view_revenue')
+
+def delete_revenue(request,revenue_id):
+	exp_det = revenue_details.objects.get(id=revenue_id)
+	try:
+		exp_det.delete()
+		messages.success(request, "Revenue record Deleted Successfully.")
+		return redirect('view_revenue')
+	except:
+		messages.error(request, "Failed to Delete the record.")
+		return redirect('view_revenue')
+
+def edit_revenue(request,revenue_id):
+	exp_obj = revenue_details.objects.filter(id=revenue_id).first()
+	admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	context = {
+		'row':exp_obj,
+	}
+	return render(request,'hod_template/edit_revenue.html',context)
+
+def edit_revenue_save(request,revenue_id):
+	if request.method != "POST":
+		messages.error(request, "Invalid Method")
+		return redirect('/edit_revenue/'+revenue_id)
+	else:
+		source = request.POST.get('source')
+		purpose = request.POST.get('purpose')
+		pm = request.POST.get('paymode')
+		cn = request.POST.get('cheque_number')
+		rvobt = request.POST.get('rvobt')
+
+		if int(rvobt) <= 0:
+			messages.error(request, "Price must be non-zero positive value!")
+			return redirect('/edit_revenue/'+revenue_id)
+	
+		
+		if source is None:
+			temp = revenue_details.objects.filter(id=revenue_id).first()
+			source = temp.source
+		
+		if pm is None:
+			temp = revenue_details.objects.filter(id=revenue_id).first()
+			pm = temp.paymode
+
+		admin_obj = AdminHOD.objects.get(admin=request.user.id)
+		curr_date = datetime.now().date().strftime("%Y")
+		try:
+			
+			exp_det = revenue_details.objects.update_or_create(
+				id = revenue_id,defaults={
+				'source':source,
+				'purpose' : purpose,
+				'paymode' : pm,
+				'cheque_number' : cn,
+				'total_revenue' : int(rvobt),
+				}
+			)
+			
+			#exp_det.save()
+			messages.success(request, "Revenue Record updated Successfully!")
+			return redirect('/edit_revenue/'+revenue_id)
+		except:
+			messages.error(request, "Failed to update revenue record.")
+			return redirect('/edit_revenue/'+revenue_id)

@@ -1,0 +1,143 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Manage Revenue
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Add new Revenue record</h3>
+                </div>
+                <!-- /.card-header -->
+
+                            {% comment %} Display Messages {% endcomment %}
+                            {% if messages %}
+                            <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                {% if message.tags == "error" %}
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                {% elif message.tags == "success" %}
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            </div>
+                            {% endif %}
+                        
+                <form method="POST" action="{% url 'add_revenue_save' %}">
+                    {% csrf_token %}
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Source</label>
+                            <select name="source" class="form-control " style=" width: 100%;" required>
+                                <option value="Student" style="color: black;">Student</option>
+                                <option value="Sponsor" style="color: black;">Sponsor</option>
+                                <option value="Research Grant" style="color: black;">Research Grant</option>
+                                <option value="Development Grant" style="color: black;">Development Grant</option>
+                                <option value="Alumini Donations" style="color: black;">Alumini Donations</option>
+                            </select>
+                            </div>
+                        <div class="form-group">
+                            <label>Purpose</label>
+                        <input type="text" minlength="1" maxlength="100" name="purpose" class="form-control" required></div>
+                        <div class="form-group">
+                            <label>Payment Mode</label>
+                        <select name="paymode" class="form-control " style=" width: 100%;" required>
+                          <option value="Cash" style="color: black;">Cash</option>
+                          <option value="Cheque" style="color: black;">Cheque</option>
+                          <option value="Net banking" style="color: black;">Net banking</option>
+                          <option value="Credit/Debit Cards" style="color: black;">Credit/Debit Cards</option>
+                          <option value="UPI/Others" style="color: black;">UPI/Others</option>
+                      </select>
+                      </div>
+                        <div class="form-group">
+                            <label>Cheque Number (if applicable)</label>
+                        <input type="number" minlength="2" maxlength="20" name="cheque_number" class="form-control" required></div>
+                        <div class="form-group">
+                            <label>Revenue Obtained</label>
+                        <input type="number" minlength="2" maxlength="20" name="rvobt" class="form-control" required></div>
+                    </div>
+                    </div>
+                    <!-- /.card-body -->
+
+                    <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button> <br/>&nbsp;
+                    </div>
+
+                </form>
+
+                </div>
+                <!-- /.card -->
+
+
+
+            </div>
+        </div>
+        <div class="row">
+			<div class="col-md-12">
+				<div class="card card-success">
+					<div class="card-header">
+						<h3 class="card-title">Past Revenue Details</h3>
+					</div>
+					
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table">
+								<thead class="thead-light">
+								<tr>
+									<th>Sr. no.</th>
+                                    <th>Source</th>
+                                    <th>Purpose</th>
+                                    <th>Payment Mode</th>
+                                    <th>Cheque Number</th>
+									<th>Fiscal Year</th>
+									<th>Total Revenue</th>
+                                    <th>Action</th>
+								</tr>
+								</thead>
+								
+								{% for row in expense %}
+								<tr>
+									<td>{{ row.id }}</td>
+                                    <td>{{ row.source }}</td>
+                                    <td>{{ row.purpose }}</td>
+                                    <td>{{ row.paymode }}</td>
+                                    <td>{{ row.cheque_number }}</td>
+									<td>{{ row.fiscal_year }}</td>
+									<td>{{ row.total_revenue }}</td>
+                                    <td>
+                                        <a href="{% url 'edit_revenue' row.id %}" class="btn btn-success">Edit</a> 
+                                        <a href="{% url 'delete_revenue' row.id %}" class="btn btn-danger">Delete</a>
+                                    </td>
+								</tr>
+								{% endfor %}
+							</table>
+						</div>
+					</div>
+					<!-- /.card-body -->
+				</div>
+			</div>
+		</div>
+	
+	</div><!-- /.container-fluid -->
+{% endblock main_content %}

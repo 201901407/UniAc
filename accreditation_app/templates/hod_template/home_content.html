@@ -67,7 +67,7 @@
               <!-- /.card -->
             </div>
             <div class="col-lg-6">
-              <!-- PIE CHART -->
+              <!-- BAR CHART -->
               <div class="card card-success">
                 <div class="card-header">
                   <h3 class="card-title">Yearly Expenses</h3>
@@ -82,6 +82,47 @@
                   <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                 </div>
                 <!-- /.card-body -->
+              </div>
+              <!-- /.card -->
+            </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-6">
+              <!-- BAR CHART -->
+              <div class="card card-success">
+                <div class="card-header">
+                  <h3 class="card-title">Yearly Revenue</h3>
+
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <canvas id="barChart2" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+                <!-- /.card-body -->
+              </div>
+              </div>
+              <!-- /.card -->
+              <div class="col-lg-6">
+              <!-- BAR CHART -->
+              <div class="card card-success">
+                <div class="card-header">
+                  <h3 class="card-title">Yearly Profit</h3>
+
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <canvas id="barChart3" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+                <!-- /.card-body -->
+              </div>
               </div>
               <!-- /.card -->
             </div>
@@ -135,7 +176,7 @@
         labels  : year_list,
         datasets: [
           {
-            label : 'Expense in lakhs',
+            label : 'Expense',
             backgroundColor     : 'rgba(60,141,188,0.9)',
             borderColor         : 'rgba(60,141,188,0.8)',
             pointRadius          : false,
@@ -168,6 +209,85 @@
         options: barChartOptions
       })
         
+      //revenue chart 
+      var year_list = {{ rev_det_year }};
+
+      var areaChartData = {
+        labels  : year_list,
+        datasets: [
+          {
+            label : 'Revenue',
+            backgroundColor     : 'rgba(60,141,188,0.9)',
+            borderColor         : 'rgba(60,141,188,0.8)',
+            pointRadius          : false,
+            pointColor          : '#3b8bba',
+            pointStrokeColor    : 'rgba(60,141,188,1)',
+            pointHighlightFill  : '#fff',
+            pointHighlightStroke: 'rgba(60,141,188,1)',
+            data                : {{rev_det}},
+          },
+        ]
+      }
+
+
+      var barChartCanvas = $('#barChart2').get(0).getContext('2d')
+      var barChartData = jQuery.extend(true, {}, areaChartData)
+      var temp0 = areaChartData.datasets[0]
+    
+      barChartData.datasets[0] = temp0
+      
+
+      var barChartOptions = {
+        responsive              : true,
+        maintainAspectRatio     : false,
+        datasetFill             : false
+      }
+
+      var barChart = new Chart(barChartCanvas, {
+        type: 'bar', 
+        data: barChartData,
+        options: barChartOptions
+      })
+
+      //profit chart
+      var year_list = {{ rev_det_year }};
+
+      var areaChartData = {
+        labels  : year_list,
+        datasets: [
+          {
+            label : 'Profit',
+            backgroundColor     : 'rgba(60,141,188,0.9)',
+            borderColor         : 'rgba(60,141,188,0.8)',
+            pointRadius          : false,
+            pointColor          : '#3b8bba',
+            pointStrokeColor    : 'rgba(60,141,188,1)',
+            pointHighlightFill  : '#fff',
+            pointHighlightStroke: 'rgba(60,141,188,1)',
+            data                : {{pro_det}},
+          },
+        ]
+      }
+
+
+      var barChartCanvas = $('#barChart3').get(0).getContext('2d')
+      var barChartData = jQuery.extend(true, {}, areaChartData)
+      var temp0 = areaChartData.datasets[0]
+    
+      barChartData.datasets[0] = temp0
+      
+
+      var barChartOptions = {
+        responsive              : true,
+        maintainAspectRatio     : false,
+        datasetFill             : false
+      }
+
+      var barChart = new Chart(barChartCanvas, {
+        type: 'bar', 
+        data: barChartData,
+        options: barChartOptions
+      })
     })
   </script>
 
