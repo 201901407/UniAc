@@ -7,8 +7,7 @@
 
 {% block main_content %}
 {% load static %}
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{% static "dist/js/multiple_drop.js" %}" ></script>
 <section class="content">
     <div class="container-fluid">
 
@@ -72,7 +71,10 @@
                                 <div class="col"><input type="checkbox" name="fields[]" value="gender" class="form-control" id = "genderc" autocomplete="off" onclick="Checktorfadv(`genderc`,`genderip`,`genderqu`)"></div>
                                 <div class="col"><input type="text" name="headers[]" id = "genderip" class="form-control" value="Gender" disabled></div>
                                 <div class="col">
-                                    <select name="genderq" id = "genderqu" multiple="multiple" disabled>
+                                    <select name="genderq" class="form-control" id="genderqu" multiple multiselect-search="true" 
+                                    multiselect-select-all="true" 
+                                    multiselect-max-items="3"
+                                    multiselect-hide-x = "false"  disabled>
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
                                     </select>
@@ -126,10 +128,3 @@
             }
         </script> 
 {% endblock main_content %}
-{% block custom_js %}
-<script>
-    $(document).ready(function() {
-                $('#genderqu').select2();
-                });
-</script>
-{% endblock custom_js %}

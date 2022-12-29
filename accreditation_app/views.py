@@ -16,13 +16,9 @@ def loginUser(request):
 
 def doLogin(request):
 	
-	print("here")
 	email_id = request.GET.get('email')
 	password = request.GET.get('password')
-	# user_type = request.GET.get('user_type')
-	print(email_id)
-	print(password)
-	print(request.user)
+	
 	if not (email_id and password):
 		messages.error(request, "Please provide all the details!!")
 		return render(request, 'login_page.html')
@@ -67,11 +63,7 @@ def doRegistration(request):
 	context = {
 		'institutes':all_institutes,
 	}
-	print(email_id)
-	print(password)
-	print(confirm_password)
-	print(first_name)
-	print(last_name)
+	
 	if not (email_id and password and confirm_password and user_type and first_name and last_name):
 		messages.error(request, 'Please provide all the details!')
 		return render(request, 'registration.html',context)
@@ -103,6 +95,7 @@ def doRegistration(request):
 	last_name = last_name,
 	)
 
+	
 	user_obj = CustomUser.objects.get(email=email_id)
 	if user_type == "staff":
 		Staffs.objects.update_or_create(admin=user_obj,defaults={'institute_to_belong':inst_obj,'name':first_name+" "+last_name})
