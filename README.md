@@ -19,9 +19,16 @@ POSTGRES_DB_HOST = <HOST_ON_WHICH_POSTGRES_IS_RUNNING> (Can be localhost or some
 POSTGRES_DB_PORT = <PORT_ON_WHICH_DB_IS_ACCESSIBLE>
 ```
 <br/>
-Step 4: Migrate the schema to the database using the following commands:<br/>
-```python manage.py makemigrations``` and then, ```python manage.py migrate```<br/>
-Step 5: Now, fire up the development server at 127.0.0.1:8000 using the following command:<br/>
+Step 6: Migrate the schema to the database using the following commands:<br/>
+```python
+python manage.py makemigrations
+``` 
+and then, 
+```python
+python manage.py migrate
+```
+<br/>
+Step 7: Now, fire up the development server at 127.0.0.1:8000 using the following command:<br/>
 ```python manage.py runserver```<br/>
 <br/>
 <br/>
