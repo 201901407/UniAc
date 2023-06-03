@@ -37,7 +37,7 @@ python manage.py runserver
 <br/>
 <br/>
 <br/>
-NOTE: Clear sqlite3 database in order to initiate fresh copy.
+NOTE: Create fresh PostgreSQL Database for running this application.
 
 
 
