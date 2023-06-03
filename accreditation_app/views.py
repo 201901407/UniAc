@@ -1,7 +1,9 @@
+from django.forms import ValidationError
 from django.shortcuts import render,HttpResponse, redirect,HttpResponseRedirect
 from django.contrib.auth import logout, authenticate, login
 from .models import CustomUser, Staffs, Students, AdminHOD, institute_details
 from django.contrib import messages
+from django.contrib.auth.password_validation import validate_password, MinimumLengthValidator, CommonPasswordValidator, NumericPasswordValidator, password_validators_help_texts
 
 def home(request):
 	return render(request, 'home.html')
@@ -18,26 +20,23 @@ def doLogin(request):
 	
 	email_id = request.GET.get('email')
 	password = request.GET.get('password')
-	
-	if not (email_id and password):
-		messages.error(request, "Please provide all the details!!")
-		return render(request, 'login_page.html')
 
-	user = CustomUser.objects.filter(email=email_id,password=password).last()
+	if not (email_id and password):
+		messages.error(request, "Please provide both username and password!!")
+		return render(request, 'login_page.html')
+	
 	op = CustomUser.objects.filter(email=email_id).last()
-	if not user and not op.check_password(password):
+	if not op.check_password(password):
 		messages.error(request, 'Invalid Login Credentials!!')
 		return render(request, 'login_page.html')
 
-	login(request, user)
-	print(request.user)
-	print(user.user_type)
+	login(request, op)
 
-	if user.user_type == "student":
+	if op.user_type == "student":
 		return redirect('student_home/')
-	elif user.user_type == "staff":
+	elif op.user_type == "staff":
 		return redirect('staff_home/')
-	elif user.user_type == "hod":
+	elif op.user_type == "hod":
 		return redirect('admin_home/')
 
 	return render(request, 'home.html')
@@ -45,8 +44,12 @@ def doLogin(request):
 	
 def registration(request):
 	all_institutes = institute_details.objects.all()
+	obj = NumericPasswordValidator()
+	obj2 = MinimumLengthValidator()
+	obj3 = CommonPasswordValidator()
 	context = {
 		'institutes':all_institutes,
+		'helptext': password_validators_help_texts([obj, obj2, obj3])
 	}
 	return render(request, 'registration.html',context)
 	
@@ -60,16 +63,26 @@ def doRegistration(request):
 	password = request.GET.get('password')
 	confirm_password = request.GET.get('confirmPassword')
 	all_institutes = institute_details.objects.all()
+	obj = NumericPasswordValidator()
+	obj2 = MinimumLengthValidator()
+	obj3 = CommonPasswordValidator()
+	helptext = password_validators_help_texts([obj, obj2, obj3])
 	context = {
 		'institutes':all_institutes,
+		'helptext': helptext
 	}
-	
+
 	if not (email_id and password and confirm_password and user_type and first_name and last_name):
-		messages.error(request, 'Please provide all the details!')
+		messages.error(request, 'Please provide all the details!!')
 		return render(request, 'registration.html',context)
 	
 	if password != confirm_password:
 		messages.error(request, 'Both passwords should match!!')
+		return render(request, 'registration.html',context)
+	try:
+		isValid = validate_password(password, CustomUser, [obj, obj2, obj3])
+	except ValidationError:
+		messages.error(request, "Please enter valid password!!")
 		return render(request, 'registration.html',context)
 
 	is_user_exists = CustomUser.objects.filter(email=email_id).exists()
@@ -89,13 +102,14 @@ def doRegistration(request):
 	user = CustomUser.objects.create(
 	username = username,
 	email = email_id,
-	password = password,
 	user_type = user_type,
 	first_name = first_name,
 	last_name = last_name,
 	)
 
-	
+	user.set_password(password)
+	user.save()
+
 	user_obj = CustomUser.objects.get(email=email_id)
 	if user_type == "staff":
 		Staffs.objects.update_or_create(admin=user_obj,defaults={'institute_to_belong':inst_obj,'name':first_name+" "+last_name})
