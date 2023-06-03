@@ -8,7 +8,7 @@ Step 3: Clone this repository in the desired folder by using the following comma
 ```git clone https://github.com/201901407/University_accreditation_system.git```<br/>
 Step 4: Create a file named .env in the accreditation_system folder.<br/>
 Step 5 Add the following environment variables in the .env file:<br/>
-`SECRET_KEY = <YOUR_DJANGO_SECRET_KEY>```
+`SECRET_KEY = <YOUR_DJANGO_SECRET_KEY>
 
 DEBUG = True/False
 
