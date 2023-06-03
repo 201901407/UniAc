@@ -26,9 +26,11 @@ and then,
 ```python
 python manage.py migrate
 ```
-<br/>
 Step 7: Now, fire up the development server at 127.0.0.1:8000 using the following command:<br/>
-```python manage.py runserver```<br/>
+```python
+python manage.py runserver
+```
+<br/>
 <br/>
 <br/>
 NOTE: Clear sqlite3 database in order to initiate fresh copy.
