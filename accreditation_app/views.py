@@ -1,9 +1,21 @@
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.forms import ValidationError
-from django.shortcuts import render,HttpResponse, redirect,HttpResponseRedirect
+from django.shortcuts import render, redirect,HttpResponseRedirect
 from django.contrib.auth import logout, authenticate, login
 from .models import CustomUser, Staffs, Students, AdminHOD, institute_details
 from django.contrib import messages
 from django.contrib.auth.password_validation import validate_password, MinimumLengthValidator, CommonPasswordValidator, NumericPasswordValidator, password_validators_help_texts
+from django.core.validators import validate_email
+from .email_ver import account_activation_token
+from django.contrib.sites.shortcuts import get_current_site  
+from django.template.loader import render_to_string 
+from django.utils.encoding import force_bytes, force_str
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import environ, smtplib
+
+env = environ.Env()
+environ.Env.read_env()
 
 def home(request):
 	return render(request, 'home.html')
@@ -72,6 +84,7 @@ def doRegistration(request):
 		'helptext': helptext
 	}
 
+	
 	if not (email_id and password and confirm_password and user_type and first_name and last_name):
 		messages.error(request, 'Please provide all the details!!')
 		return render(request, 'registration.html',context)
@@ -79,6 +92,13 @@ def doRegistration(request):
 	if password != confirm_password:
 		messages.error(request, 'Both passwords should match!!')
 		return render(request, 'registration.html',context)
+	
+	try:
+		validate_email(email_id)
+	except ValidationError as e:
+		messages.error(request, 'Please enter valid email address!!')
+		return render(request, 'registration.html',context)
+
 	try:
 		isValid = validate_password(password, CustomUser, [obj, obj2, obj3])
 	except ValidationError:
@@ -96,7 +116,7 @@ def doRegistration(request):
 	if inst_obj.mail_prefix != mp:
 		messages.error(request, 'The mail prefix of institute is not valid. Please enter valid mail prefix!')
 		return render(request, 'registration.html',context)
-
+	
 	username = email_id.split('@')[0]
 
 	user = CustomUser.objects.create(
@@ -108,7 +128,34 @@ def doRegistration(request):
 	)
 
 	user.set_password(password)
+	user.is_active = False
 	user.save()
+
+	current_site = get_current_site(request)
+	uid = urlsafe_base64_encode(force_bytes(user.pk))
+	token = account_activation_token.make_token(user)
+
+	email_message = MIMEMultipart()
+	email_message['From'] = str(env('EMAIL_HOST_USER'))
+	email_message['To'] = email_id
+	email_message['Subject'] = 'Verify your email address for creation of your account in UniAc'
+	email_message.attach(MIMEText(render_to_string('email_template.html',{
+			'header': "Welcome to UniAc",
+			'domain': current_site.domain,
+			'uid': uid,
+			'token': token,
+			'text': "Hi " + first_name + " " + last_name + "! Welcome to UniAc. We are very excited to have you. To finish activating your account please click the link below.",
+			'c2a_button':"Activate Account"
+		}),"html"))
+	
+	email_as_string = email_message.as_string()
+	smtpObj = smtplib.SMTP(str(env('EMAIL_HOST')),int(env('EMAIL_PORT')))
+	smtpObj.starttls()
+
+	smtpObj.login(str(env('EMAIL_HOST_USER')),str(env('EMAIL_HOST_PASSWORD')))
+	
+	smtpObj.sendmail(str(env('EMAIL_HOST_USER')), email_id, email_as_string)     
+	smtpObj.quit()
 
 	user_obj = CustomUser.objects.get(email=email_id)
 	if user_type == "staff":
@@ -118,6 +165,7 @@ def doRegistration(request):
 		print("boom")
 	elif user_type == "hod":
 		AdminHOD.objects.update_or_create(admin=user_obj,defaults={'institute_to_belong':inst_obj})
+	messages.success(request,'An email with the activation link has been sent to your email address. Please follow the steps to activate your account!!')
 	return render(request, 'login_page.html')
 
 	
@@ -176,3 +224,21 @@ def doInstReg(request):
 
 def inreg(request):
 	return render(request,'ireg.html')
+
+def activate(request, uidb64, token):
+	try:
+		uid = urlsafe_base64_decode(uidb64).decode()
+		user = CustomUser.objects.get(pk=uid)  
+	except(TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):  
+		print("here")
+		user = None  
+
+	if user is not None and account_activation_token.check_token(user, token):  
+		user.is_active = True  
+		user.save()  
+		messages.success(request,"Thank you for your email confirmation. Please proceed to login.")
+		return render(request,'login_page.html')
+
+	else:  
+		messages.error(request,"Activation link is not valid!!")
+		return redirect('registration')  

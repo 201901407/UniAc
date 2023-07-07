@@ -16,6 +16,7 @@ urlpatterns = [
 	path('doRegistration', views.doRegistration, name="doRegistration"),
 	path('inreg',views.inreg,name="inreg"),
 	path('doInstReg', views.doInstReg, name="doInstReg"),
+    path('activate/<uidb64>/<token>/',views.activate, name='activate'),  
 	
 	# URLS for Student
 	path('student_home/', StudentViews.student_home, name="student_home"),

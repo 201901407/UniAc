@@ -145,5 +145,12 @@ STATIC_ROOT=os.path.join(BASE_DIR,"static")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accreditation_app.CustomUser'
-AUTH_EXEMPT_ROUTES = ('admin/', 'home', 'contact','login','registration','doLogin','doRegistration','inreg','doInstReg')
+AUTH_EXEMPT_ROUTES = ('admin/', 'home', 'contact','login','registration','doLogin','doRegistration','inreg','doInstReg','activate')
 AUTH_LOGIN_ROUTE = 'login'
+
+EMAIL_USE_TLS = env('EMAIL_USE_TLS')
+EMAIL_HOST = env('EMAIL_HOST')  
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')  
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD') 
+EMAIL_PORT = env('EMAIL_PORT')  
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
