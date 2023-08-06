@@ -20,26 +20,26 @@ from .models import CustomUser, Staffs, Students, committee_and_board, research_
 
 def admin_home(request):
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	all_student_count = Students.objects.filter(institute_to_belong=admin_obj.institute_to_belong).count()
-	staff_count = Staffs.objects.filter(institute_to_belong=admin_obj.institute_to_belong).count()
+	all_student_count = Students.objects.all().count()
+	staff_count = Staffs.objects.all().count()
 	
 	# For Saffs
 	staff_name_list=[]
 
-	staffs = Staffs.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
+	staffs = Staffs.objects.all()
 	for staff in staffs:
 		staff_name_list.append(staff.admin.first_name)
 
 	# For Students
 	student_name_list=[]
 
-	students = Students.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
+	students = Students.objects.all()
 	for student in students:
 		student_name_list.append(student.admin.first_name)
 
 	exp_det_year = []
 	exp_det = []
-	y_exp = expenditure_details.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
+	y_exp = expenditure_details.objects.all()
 	op_exp = y_exp.values('fiscal_year').annotate(dcount = Sum('total_expense')).order_by()
 	
 	for i in op_exp:
@@ -49,7 +49,7 @@ def admin_home(request):
 
 	rev_det_year = []
 	rev_det = []
-	yr_exp = revenue_details.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
+	yr_exp = revenue_details.objects.all()
 	opr_exp = yr_exp.values('fiscal_year').annotate(dcount = Sum('total_revenue')).order_by()
 
 	for i in opr_exp:
@@ -98,7 +98,7 @@ def add_staff_save(request):
 			messages.error(request, "Staff with following credentials already exists!")
 			return redirect('add_staff')
 
-		mp = institute_details.objects.get(id=admin_obj.institute_to_belong.id)
+		mp = institute_details.objects.all().first()
 		pref = email.split('@')[1].split('.')[0]
 
 		if pref != mp.mail_prefix:
@@ -117,7 +117,6 @@ def add_staff_save(request):
 			admin_obj = AdminHOD.objects.get(admin=request.user.id)
 			staff_obj = Staffs.objects.get(admin=user.id)
 			staff_obj.name = first_name+" "+last_name
-			staff_obj.institute_to_belong = admin_obj.institute_to_belong
 			staff_obj.save()
 			messages.success(request, "Staff Added Successfully!")
 			return redirect('add_staff')
@@ -129,7 +128,7 @@ def add_staff_save(request):
 
 def manage_staff(request):
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	staffs = Staffs.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
+	staffs = Staffs.objects.all()
 	context = {
 		"staffs": staffs
 	}
@@ -271,7 +270,6 @@ def add_student_save(request):
 			user.students.address = address
 			user.students.gender = gender
 			user.students.profile_pic = profile_pic_url
-			user.students.institute_to_belong = admin_obj.institute_to_belong
 			user.save()
 			messages.success(request, "Student Added Successfully!")
 			return redirect('add_student')
@@ -281,8 +279,7 @@ def add_student_save(request):
 
 
 def manage_student(request):
-	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	students = Students.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
+	students = Students.objects.all()
 	context = {
 		"students": students
 	}
@@ -390,7 +387,7 @@ def delete_student(request, student_id):
 def check_email_exist(request):
 	email = request.POST.get("email")
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	mp = institute_details.objects.get(id=admin_obj.institute_to_belong.id)
+	mp = institute_details.objects.all().first()
 	pref = email.split('@')[1].split('.')[0]
 	print(pref)
 	if pref != mp.mail_prefix:
@@ -452,7 +449,7 @@ def student_profile(request):
 
 def add_research_project(request):
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	op = research_area.objects.filter(institute_to_belong = admin_obj.institute_to_belong)
+	op = research_area.objects.all()
 	context = {
 		'research_area':op
 	}
@@ -472,7 +469,6 @@ def add_research_project_save(request):
 			spron_auth=spron_auth,
 			cost=cost,
 			year_completed=yc,
-			institute_to_belong = admin_obj.institute_to_belong,
 		)
 		if op:
 			messages.error(request, "This Project already exists.")
@@ -484,7 +480,6 @@ def add_research_project_save(request):
 				spron_auth=spron_auth,
 				cost=cost,
 				year_completed=yc,
-				institute_to_belong = admin_obj.institute_to_belong,
 			)
 			messages.success(request, "Details uploaded successfully.")
 			return redirect('res_proj_details')
@@ -494,7 +489,7 @@ def add_research_project_save(request):
 
 def add_comb(request):
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	op = committee_and_board.objects.filter(institute_to_belong = admin_obj.institute_to_belong)
+	op = committee_and_board.objects.all()
 	context = {
 		'cab':op
 	}
@@ -515,7 +510,6 @@ def add_comb_save(request):
 			position=pos,
 			address=add,
 			committee=com,
-			institute_to_belong=admin_obj.institute_to_belong,
 		)
 		if op:
 			messages.error(request, "This Member already exists.")
@@ -526,7 +520,6 @@ def add_comb_save(request):
 				position=pos,
 				address=add,
 				committee=com,
-				institute_to_belong=admin_obj.institute_to_belong,
 			)
 			messages.success(request, "Details uploaded successfully.")
 			return redirect('add_comb')
@@ -549,7 +542,7 @@ def render_to_pdf(template_src, context_dict={}):
 def gen_pdf_staff(request):
 	req_fields = request.POST.getlist('fields[]')
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	rec = Staffs.objects.filter(institute_to_belong=admin_obj.institute_to_belong).values(*req_fields)
+	rec = Staffs.objects.all().values(*req_fields)
 	req_headers = request.POST.getlist('headers[]')
 	return render_to_pdf('hod_template/pdf.html',
 	{
@@ -567,12 +560,12 @@ def gen_pdf_student(request):
 		q_list.append("male")
 		q_list.append("female")
 	for f in req_fields:
-		if f is "adminname":
+		if f == "adminname":
 			f = "admin.name"
-		elif f is "adminemail":
+		elif f == "adminemail":
 			f = "admin.email"
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	rec = Students.objects.filter(institute_to_belong=admin_obj.institute_to_belong,gender__in = q_list).values(*req_fields)
+	rec = Students.objects.filter(gender__in = q_list).values(*req_fields)
 	req_headers = request.POST.getlist('headers[]')
 	return render_to_pdf('hod_template/pdf.html',
 	{
@@ -585,8 +578,7 @@ def student_print_form(request):
 
 def gen_pdf_res(request):
 	req_fields = request.POST.getlist('fields[]')
-	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	rec = research_area.objects.filter(institute_to_belong=admin_obj.institute_to_belong).values(*req_fields)
+	rec = research_area.objects.all().values(*req_fields)
 	return render_to_pdf('hod_template/pdf.html',
 	{
 		'record':rec,
@@ -598,7 +590,7 @@ def res_print_form(request):
 def gen_pdf_iqac(request):
 	req_fields = request.POST.getlist('fields[]')
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	rec = committee_and_board.objects.filter(institute_to_belong=admin_obj.institute_to_belong).values(*req_fields)
+	rec = committee_and_board.objects.all().values(*req_fields)
 	return render_to_pdf('hod_template/pdf.html',
 	{
 		'record':rec,
@@ -609,7 +601,7 @@ def iqac_print_form(request):
 
 def ta_details(request):
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	ta_det = ta.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
+	ta_det = ta.objects.all()
 	context ={
 		'ta_det':ta_det,
 	}
@@ -621,7 +613,7 @@ def ta_print_form(request):
 def gen_pdf_ta(request):
 	req_fields = request.POST.getlist('fields[]')
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	rec = ta.objects.filter(institute_to_belong=admin_obj.institute_to_belong).values(*req_fields)
+	rec = ta.objects.all().values(*req_fields)
 	return render_to_pdf('hod_template/pdf.html',
 	{
 		'record':rec,
@@ -640,7 +632,7 @@ def search_student(request):
 	if count == 1:
 		keyword.append(" ") """
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	rec = Students.objects.filter(admin__first_name__contains = keyword,institute_to_belong=admin_obj.institute_to_belong)
+	rec = Students.objects.filter(admin__first_name__contains = keyword)
 	context = {
 		"students": rec
 	}
@@ -659,15 +651,14 @@ def search_staff(request):
 	if count == 1:
 		keyword.append(" ") """
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	rec = Staffs.objects.filter(admin__first_name__contains = keyword,institute_to_belong=admin_obj.institute_to_belong)
+	rec = Staffs.objects.filter(admin__first_name__contains = keyword)
 	context = {
 		"staffs": rec
 	}
 	return render(request, 'hod_template/manage_staff_template.html', context)
 
 def edit_inst(request):
-	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	inst_det = institute_details.objects.get(id = admin_obj.institute_to_belong.id)
+	inst_det = institute_details.objects.all().first()
 	context = {
 		"inst_det":inst_det,
 	}
@@ -704,7 +695,7 @@ def edit_inst_save(request):
 		admin_obj = AdminHOD.objects.get(admin=request.user.id)
 		#inst_det = institute_details.objects.get(id = admin_obj.institute_to_belong.id)
 		try:
-			inst_det = institute_details.objects.get(id = admin_obj.institute_to_belong.id)
+			inst_det = institute_details.objects.all().first()
 			
 			inst_det.name = name
 			inst_det.address = address
@@ -734,9 +725,9 @@ def edit_inst_save(request):
 			return redirect('edit_inst')
 
 def view_expense(request):
-	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	exp_det = expenditure_details.objects.filter(institute_to_belong = admin_obj.institute_to_belong)
-	all_fac = Staffs.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
+	#admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	exp_det = expenditure_details.objects.all()
+	all_fac = Staffs.objects.all()
 	context = {
 		'expense':exp_det,
 		'all_fac':all_fac,
@@ -780,7 +771,6 @@ def add_expense_save(request):
 				ordering_person = kop,
 				paymode = pm,
 				cheque_number = cn,
-				institute_to_belong = admin_obj.institute_to_belong,
 				total_expense = int(unit)*int(ppu),
 			)
 
@@ -793,8 +783,8 @@ def add_expense_save(request):
 
 def edit_expense(request,expense_id):
 	exp_obj = expenditure_details.objects.filter(id=expense_id).first()
-	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	all_fac = Staffs.objects.filter(institute_to_belong=admin_obj.institute_to_belong)
+	#admin_obj = AdminHOD.objects.get(admin=request.user.id)
+	all_fac = Staffs.objects.all()
 	context = {
 		'row':exp_obj,
 		'all_fac':all_fac,
@@ -870,7 +860,7 @@ def delete_expense(request,expense_id):
 
 def view_revenue(request):
 	admin_obj = AdminHOD.objects.get(admin=request.user.id)
-	exp_det = revenue_details.objects.filter(institute_to_belong = admin_obj.institute_to_belong)
+	exp_det = revenue_details.objects.all()
 	context = {
 		'expense':exp_det,
 	}
@@ -892,7 +882,7 @@ def add_revenue_save(request):
 			messages.error(request, "Price must be non-zero positive value!")
 			return redirect('view_revenue')
 		
-		admin_obj = AdminHOD.objects.get(admin=request.user.id)
+		#admin_obj = AdminHOD.objects.get(admin=request.user.id)
 		curr_date = datetime.now().date().strftime("%Y")
 		try:
 			exp_det = revenue_details.objects.update_or_create(
@@ -901,11 +891,10 @@ def add_revenue_save(request):
 				purpose = purpose,
 				paymode = pm,
 				cheque_number = cn,
-				institute_to_belong = admin_obj.institute_to_belong,
 				total_revenue = int(rvobt),
 			)
 
-			#exp_det.save()
+			exp_det.save()
 			messages.success(request, "Revenue Record added Successfully!")
 			return redirect('view_revenue')
 		except:

@@ -154,11 +154,6 @@ body{
               <option value="staff" style="color: black;">Staff</option>
               <option value="student" style="color: black;">Student</option>
           </select>
-          <select name="institute_name" class="form-control mb-2" style="color: white; width: 100%;">
-            {% for i in institutes%}
-            <option value={{ i.id }} style="color: black;">{{i.name}}</option>
-            {% endfor %}
-        </select>
             <div class="form-group"><input class="form-control mb-2"  style="width: 100%;" type="email" name="email" placeholder="Email"></div>
             <div class="form-group"><input class="form-control mb-2" style="width: 100%;" type="password" name="password" placeholder="Password"></div>
 			<div class="form-group"><input class="form-control mb-2" style="width: 100%;" type="password" name="confirmPassword" placeholder="Confirm Password"></div>

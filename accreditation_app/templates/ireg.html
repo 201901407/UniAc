@@ -26,7 +26,7 @@ body{
 
 .login-dark {
   max-width:320px;
-  width:90%;
+  width:100%;
   background-color: #1e2833;
   padding:40px;
   border-radius:4px;
@@ -39,8 +39,8 @@ body{
 }
 
 .login-dark form {
-  max-width:320px;
-  width:90%;
+  max-width:380px;
+  width:100%;
   background-color:#1e2833;
   padding:40px;
   border-radius:4px;
@@ -130,19 +130,18 @@ body{
 	
 	<form action="{% url 'doInstReg' %}" method="get" style="width: 100%;">
 		{% csrf_token %}
-		<h1 class="text-center" style="font-size: 2.3rem;">Register Your Institute</h1>
+		<h1 class="text-center" style="font-size: 2.3rem;">Register Institute Details</h1>
 		
-		<div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>
 		
 
 		
-		<div class="form-group"><input class="form-control mb-2" type="text" name="name" placeholder="Name of Institute" required></div>
-		<div class="form-group"><input class="form-control mb-2" type="text" name="mail_prefix" placeholder="Mail Prefix of Institute" required></div>
-        <div class="form-group"><input class="form-control mb-2" type="text" name="institute_type" placeholder="Type of Institute" required></div>
+		<div class="form-group"><input class="form-control mb-2" type="text" name="name" placeholder="Name of Institute" required ></div>
+		<div class="form-group"><input class="form-control mb-2" type="text" name="mail_prefix" placeholder="Mail Prefix of Institute" required ></div>
+        <div class="form-group"><input class="form-control mb-2" type="text" name="institute_type" placeholder="Type of Institute" required  ></div>
         <div class="form-group"><input class="form-control mb-2" type="text" name="state" placeholder="State of Location" required></div>
 		
 		
-		<div class="form-group"><button class="btn btn-primary btn-block mb-2 ml-2" type="submit">Register!</button></div>
+		<div class="form-group"><button class="btn btn-primary btn-block mb-2 ml-2" type="submit">Register!!</button></div>
 	</form>
 </div>
 {% comment %} Display Messages {% endcomment %}

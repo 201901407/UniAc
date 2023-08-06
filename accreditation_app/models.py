@@ -43,7 +43,6 @@ class institute_details(models.Model):
 class AdminHOD(models.Model):
 	id = models.AutoField(primary_key=True)
 	admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
-	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = models.Manager()
@@ -58,8 +57,6 @@ class Staffs(models.Model):
 	experience = models.IntegerField(default=0) 
 	number_of_doctorate_students_guided = models.BigIntegerField(default=0)
 	number_of_graduate_students_guided = models.BigIntegerField(default=0)
-	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
-	#address = models.TextField()
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = models.Manager()
@@ -71,7 +68,6 @@ class Students(models.Model):
 	gender = models.TextField(max_length=50,default="")
 	profile_pic = models.FileField(upload_to='images/',null=True)
 	address = models.TextField(default="")
-	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 	objects = models.Manager()
@@ -84,7 +80,6 @@ class ta(models.Model):
 	name = models.TextField(max_length=255)
 	guide = models.ForeignKey(Staffs,on_delete=models.CASCADE,default=1)
 	area_of_work = models.TextField(max_length=1000)
-	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	year_of_registration = models.IntegerField(validators=[MinValueValidator(2002),MaxValueValidator(datetime.date.today().year)])
 	type = models.CharField(max_length=255)
 	objects = models.Manager()
@@ -125,7 +120,6 @@ class research_area(models.Model):
 	title = models.TextField(max_length=1000)
 	spron_auth = models.TextField(max_length=255)
 	cost = models.BigIntegerField(default=1,validators=[MinValueValidator(1)])
-	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	objects = models.Manager()
 
 class committee_and_board(models.Model):
@@ -133,7 +127,6 @@ class committee_and_board(models.Model):
 	name = models.TextField(max_length=255)
 	position = models.TextField(max_length=255)
 	address = models.CharField(max_length=600)
-	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	committee = models.CharField(max_length=255)
 	objects = models.Manager()
 
@@ -148,7 +141,6 @@ class expenditure_details(models.Model):
 	ordering_person = models.ForeignKey(Staffs,on_delete=models.CASCADE,default=1)
 	paymode = models.TextField(default="")
 	cheque_number = models.TextField(default="")
-	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	total_expense = models.BigIntegerField(default=0)
 	objects = models.Manager()
 
@@ -160,5 +152,4 @@ class revenue_details(models.Model):
 	paymode = models.TextField(default="")
 	cheque_number = models.TextField(default="")
 	total_revenue = models.BigIntegerField(default=0)
-	institute_to_belong = models.ForeignKey(institute_details,on_delete=models.CASCADE,default=1)
 	objects = models.Manager()
