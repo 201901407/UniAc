@@ -1,6 +1,7 @@
 from ast import keyword
 from datetime import datetime
 from distutils.log import error
+from pathlib import Path
 from turtle import position, title
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -11,7 +12,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.db.models import Count,Sum
-import json
+import csv
+from django.apps import apps
 
 from .forms import AddStudentForm, EditStudentForm
 
@@ -963,3 +965,59 @@ def edit_revenue_save(request,revenue_id):
 		except:
 			messages.error(request, "Failed to update revenue record.")
 			return redirect('/edit_revenue/'+revenue_id)
+
+def files(request):
+	return render(request,'hod_template/files.html')
+
+def decode_utf8(line_iterator):
+    for line in line_iterator:
+        yield line.decode('utf-8')
+
+def uploadFiles(request):
+	if request.method != "POST":
+		messages.error(request, "Invalid Method")
+		return redirect("files")
+	else:
+
+		table_name = request.POST.get('filetype')
+		if len(request.FILES) != 0:
+			upfile = request.FILES['recordFile']
+			if not upfile.name.endswith('.csv') and not upfile.name.endswith('.xlsx'):
+				messages.error(request, "Only files with extensions .csv and .xlsx are supported for upload!!")
+				return redirect("files")
+			file = csv.DictReader(decode_utf8(upfile))
+		else:
+			messages.error(request, "Couldn't upload the file. Please try again!")
+			return redirect("files")
+		#print(file)
+
+		model = apps.get_model('accreditation_app',table_name)
+		col_headers = [field.name for field in model._meta.get_fields(False,False)]
+		
+		fail_count = 0
+		is_check_success = 0
+		for eachRecord in file:
+			if not is_check_success:
+				for k in eachRecord:
+					if not (k in col_headers):
+						errmess = "File upload failed. Incorrect fields detected: {}"
+						messages.error(request,errmess.format(k))
+						return redirect("files")
+			is_check_success = 1
+			if table_name == "expenditure_details":
+				username = eachRecord["ordering_person"]
+				cuserobj = CustomUser.objects.get(username=username)
+				staffobj = Staffs.objects.get(admin=cuserobj.id)
+				eachRecord['ordering_person'] = staffobj
+
+			try:
+				model.objects.update_or_create(eachRecord)
+			except:
+				fail_count = fail_count + 1
+		
+		if fail_count == 0:
+			messages.success(request,"File upload was successful!")
+		else:
+			errmess = "File upload failed. Failure count: {}"
+			messages.error(request,errmess.format(fail_count))
+		return redirect("files")

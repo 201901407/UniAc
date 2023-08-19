@@ -1,0 +1,81 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Upload files
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Upload Files</h3>
+                </div>
+                <!-- /.card-header -->
+
+                            {% comment %} Display Messages {% endcomment %}
+                            {% if messages %}
+                            <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                {% if message.tags == "error" %}
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                {% elif message.tags == "success" %}
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            </div>
+                            {% endif %}
+                        
+                <form method="POST" action="{% url 'uploadFiles' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="card-body">
+                       
+                        <div class="form-group">
+                            <label>Select the type of records to be uploaded</label>
+                            <select name="filetype" class="form-control" required>
+                                <option value="expenditure_details">Expense Details</option>
+                                <option value="revenue_details">Revenue Details</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Upload File (Files with Extensions .csv and .xlsx are supported)</label>
+                            <input type="file" name="recordFile" accept=".csv,.xlsx,.xls" class="form-control" required>
+                        </div>
+                        
+                    </div>
+                    <!-- /.card-body -->
+
+                    <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button> <br/>&nbsp;
+                    </div>
+
+                </form>
+
+                </div>
+                <!-- /.card -->
+
+
+
+            </div>
+        </div>
+	
+	</div><!-- /.container-fluid -->
+{% endblock main_content %}

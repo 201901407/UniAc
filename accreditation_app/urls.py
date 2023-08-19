@@ -79,4 +79,8 @@ urlpatterns = [
 	path('edit_revenue/<revenue_id>/',HodViews.edit_revenue,name="edit_revenue"),
 	path('delete_revenue/<revenue_id>/',HodViews.delete_revenue,name="delete_revenue"),
 	path('edit_revenue_save/<revenue_id>/',HodViews.edit_revenue_save,name="edit_revenue_save"),
+    
+	#Files Upload
+	path('files/',HodViews.files,name="files"),
+    path('uploadFiles/',HodViews.uploadFiles,name="uploadFiles")
 ]+ static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)
