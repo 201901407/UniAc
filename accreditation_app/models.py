@@ -153,3 +153,10 @@ class revenue_details(models.Model):
 	cheque_number = models.TextField(default="")
 	total_revenue = models.BigIntegerField(default=0)
 	objects = models.Manager()
+
+class uploadedFilesHistory(models.Model):
+	id = models.AutoField(primary_key=True)
+	filetype = models.TextField(default="")
+	timestamp = models.DateTimeField(auto_now_add=True)
+	status = models.BooleanField(default=False)
+	whatUser = models.ForeignKey(CustomUser,on_delete=models.CASCADE)

@@ -76,6 +76,45 @@
 
             </div>
         </div>
-	
+        <div class="row">
+			<div class="col-md-12">
+				<div class="card card-success">
+					<div class="card-header">
+						<h3 class="card-title">Upload History</h3>
+					</div>
+					
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table">
+								<thead class="thead-light">
+								<tr>
+									<th>Sr. no.</th>
+                                    <th>Record Type</th>
+                                    <th>Status</th>
+                                    <th>User</th>
+                                    <th>Timestamp</th>
+								</tr>
+								</thead>
+								
+								{% for row in upload_history %}
+								<tr>
+									<td>{{ row.id }}</td>
+                                    <td>{{ row.filetype }}</td>
+                                    {% if row.status %}
+                                    <td><p>Success</p></td>
+                                    {% else %}
+                                    <td><p>Failure</p></td>
+                                    {% endif %}
+                                    <td>{{ row.whatUser.username }} ({{ row.whatUser.first_name }} {{ row.whatUser.last_name }})</td>
+                                    <td>{{ row.timestamp }}</td>
+								</tr>
+								{% endfor %}
+							</table>
+						</div>
+					</div>
+					<!-- /.card-body -->
+				</div>
+			</div>
+		</div>
 	</div><!-- /.container-fluid -->
 {% endblock main_content %}

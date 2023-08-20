@@ -17,7 +17,7 @@ from django.apps import apps
 
 from .forms import AddStudentForm, EditStudentForm
 
-from .models import CustomUser, Staffs, Students, committee_and_board, research_area,ta,AdminHOD,institute_details,expenditure_details,revenue_details
+from .models import CustomUser, Staffs, Students, committee_and_board, research_area,ta,AdminHOD,institute_details,expenditure_details,revenue_details, uploadedFilesHistory
 
 
 def admin_home(request):
@@ -967,7 +967,11 @@ def edit_revenue_save(request,revenue_id):
 			return redirect('/edit_revenue/'+revenue_id)
 
 def files(request):
-	return render(request,'hod_template/files.html')
+	uphis = uploadedFilesHistory.objects.all()
+	context = {
+		'upload_history': uphis
+	}
+	return render(request,'hod_template/files.html',context)
 
 def decode_utf8(line_iterator):
     for line in line_iterator:
@@ -1002,6 +1006,11 @@ def uploadFiles(request):
 					if not (k in col_headers):
 						errmess = "File upload failed. Incorrect fields detected: {}"
 						messages.error(request,errmess.format(k))
+						uploadedFilesHistory.objects.create(
+							filetype= table_name,
+							status= False,
+							whatUser= CustomUser.objects.get(id=request.user.id)
+						)
 						return redirect("files")
 			is_check_success = 1
 			if table_name == "expenditure_details":
@@ -1017,7 +1026,17 @@ def uploadFiles(request):
 		
 		if fail_count == 0:
 			messages.success(request,"File upload was successful!")
+			uploadedFilesHistory.objects.create(
+							filetype= table_name,
+							status= False,
+							whatUser= CustomUser.objects.get(id=request.user.id)
+						)
 		else:
 			errmess = "File upload failed. Failure count: {}"
 			messages.error(request,errmess.format(fail_count))
+			uploadedFilesHistory.objects.create(
+							filetype= table_name,
+							status= False,
+							whatUser= CustomUser.objects.get(id=request.user.id)
+						)
 		return redirect("files")
