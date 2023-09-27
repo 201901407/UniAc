@@ -1,5 +1,11 @@
 # UniAc (University Accreditation System)
-# Created and built by Darshil Parikh
+Tired of maintaining bundles and old-school files of accreditation data for submission to NAAC every year? UniAc is freely-available open source digitized repository of storing all accreditation data. UniAc has three access personas in order to govern access to the data namely:
+1. Admin/HoD
+2. Staff
+3. Student
+
+UniAc has interactive charts to visualize the data in an interactive way. UniAc also provides the fuctionality to construct automated PDF reports from the accreditation data which can be directly used for submission.
+### The project is live at [UniAc](https://dobbyhacker54.pythonanywhere.com/).
 ## Steps to install and run University Accreditation System on your machine:
 Prerequisites: Python and Pip <br/><br/> 
 Step 1: Clone this repository in the desired folder by using the following command.<br/>
