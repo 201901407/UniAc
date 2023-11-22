@@ -4,7 +4,7 @@ Tired of maintaining bundles and old-school files of accreditation data for subm
 2. Staff
 3. Student
 
-UniAc has interactive charts to visualize the data in an interactive way. UniAc also provides the fuctionality to construct automated PDF reports from the accreditation data which can be directly used for submission.
+UniAc supports fully automated bulk upload of data from other data sources like Google Sheets and MS Excel. UniAc has interactive charts to visualize the data in an interactive way. UniAc also provides the fuctionality to construct automated PDF reports from the accreditation data which can be directly used for submission.
 ### The project is live at [UniAc](https://dobbyhacker54.pythonanywhere.com/).
 ## Steps to install and run University Accreditation System on your machine:
 Prerequisites: Python and Pip <br/><br/> 
