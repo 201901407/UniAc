@@ -1,0 +1,147 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Add Course
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- general form elements -->
+                    <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Add Course</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <form role="form" method="POST" action="{% url 'add_course_save' %}">
+                        {% csrf_token %}
+
+                        
+                                {% comment %} Display Messages {% endcomment %}
+                                {% if messages %}
+                                <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                    {% if message.tags == "error" %}
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                    {% elif message.tags == "success" %}
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                </div>
+                                {% endif %}
+                            
+
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Course ID</label>
+                                <input type="text" class="form-control" name="course_id" placeholder="Course ID" id="course_id" maxlength="7" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Course Name</label>
+                                <input type="text" class="form-control" name="course_name" placeholder="Name of the Course" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Enrolled Students</label>
+                                <input type="number" class="form-control" name="enrolled_students" placeholder="Number of Students enrolled in the Course" min="1" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Course Instructor</label>
+                                <select class="form-control" name="course_instructor[]" multiple="multiple" required>
+                                    {% for each_faculty in all_faculty %}
+                                    <option value={{ each_faculty.id }}>{{ each_faculty.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Course TAs</label>
+                                <select class="form-control" name="involved_ta[]" multiple="multiple">
+                                    {% for each_ta in all_ta %}
+                                    <option value={{ each_ta.id }}>{{ each_ta.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            
+
+
+                        </div>
+                        <!-- /.card-body -->
+
+                        <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Add Course</button>
+                        </div>
+                    </form>
+                    </div>
+                    <!-- /.card -->
+
+                </div>
+            </div>
+
+        </div><!-- /.container-fluid -->
+      </section>
+
+  {% endblock main_content %}
+
+    {% block custom_js %}
+    {% comment %} Checking if course ID is not duplicated {% endcomment %}
+
+    <script>
+        $(document).ready(function(){
+            // keyup event will be triggered when user leaves keyboard
+            $("#course_id").keyup(function(){
+                var course_id = $(this).val();
+
+                if(course_id!=""){
+                    $.ajax({
+                        url : '{% url 'check_course_exist' %}',
+                        type : 'POST',
+                        data : {course_id:course_id}
+                    })
+                    .done(function(response){
+
+                        if(response == "True"){
+                            $(".course_error").remove();
+                            $("<span class='course_error' style='color: red; padding: 5px; font-weight: bold;'> Course with following ID already exists </span>").insertAfter("#course_id")
+                        }
+                        else
+                        {
+                            $(".course_error").remove();
+                        }
+                    })
+
+                    .fail(function(){
+                        console.log("Failed");
+                    })
+                }
+                else{
+                    $(".course_error").remove();
+                }
+                
+            })
+        })
+    </script>
+
+  {% endblock custom_js %}

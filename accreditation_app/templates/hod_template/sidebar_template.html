@@ -139,6 +139,15 @@
                 </p>
               </a>
             </li>
+            <li class="nav-item">
+              {% url 'viewCourse' as viewCourse %}
+              <a href="{{ viewCourse }}" class="nav-link {% if request.path == view_courses %} active {% endif %}">
+                <i class="nav-icon fas fa-book"></i>
+                <p>
+                  Manage Courses
+                </p>
+              </a>
+            </li>
           </ul>
         </nav>
         <!-- /.sidebar-menu -->

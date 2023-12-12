@@ -82,5 +82,11 @@ urlpatterns = [
     
 	#Files Upload
 	path('files/',HodViews.files,name="files"),
-    path('uploadFiles/',HodViews.uploadFiles,name="uploadFiles")
+    path('uploadFiles/',HodViews.uploadFiles,name="uploadFiles"),
+    
+	#Course
+	path('viewCourse/',HodViews.viewCourse,name="viewCourse"),
+    path('check_course_exist/', HodViews.check_course_exist, name="check_course_exist"),
+    path('add_course/',HodViews.add_course,name="add_course"),
+    path('add_course_save/',HodViews.add_course_save,name="add_course_save"),
 ]+ static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

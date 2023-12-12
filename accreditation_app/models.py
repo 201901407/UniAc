@@ -160,3 +160,12 @@ class uploadedFilesHistory(models.Model):
 	timestamp = models.DateTimeField(auto_now_add=True)
 	status = models.BooleanField(default=False)
 	whatUser = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
+
+class Courses(models.Model):
+	id = models.AutoField(primary_key=True)
+	course_name = models.TextField(default="")
+	course_id = models.TextField(default="",max_length=6)
+	enrolled_students = models.BigIntegerField(default=0)
+	course_instructor = models.ManyToManyField(Staffs)
+	involved_ta = models.ManyToManyField(ta)
+

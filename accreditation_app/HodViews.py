@@ -17,7 +17,7 @@ from django.apps import apps
 
 from .forms import AddStudentForm, EditStudentForm
 
-from .models import CustomUser, Staffs, Students, committee_and_board, research_area,ta,AdminHOD,institute_details,expenditure_details,revenue_details, uploadedFilesHistory
+from .models import CustomUser, Staffs, Students, committee_and_board, research_area,ta,AdminHOD,institute_details,expenditure_details,revenue_details, uploadedFilesHistory, Courses
 
 
 def admin_home(request):
@@ -1040,3 +1040,66 @@ def uploadFiles(request):
 							whatUser= CustomUser.objects.get(id=request.user.id)
 						)
 		return redirect("files")
+
+def viewCourse(request):
+	all_courses = Courses.objects.all()
+	context = {
+		'all_courses': all_courses
+	}
+	return render(request,'hod_template/courses.html',context)
+
+@csrf_exempt
+def check_course_exist(request):
+	course_id = request.POST.get("course_id")
+	
+	admin_obj = Courses.objects.filter(course_id=course_id)
+	if admin_obj:
+		return HttpResponse(True)
+	else:
+		return HttpResponse(False)
+
+def add_course(request):
+	all_staff = Staffs.objects.all()
+	all_ta = ta.objects.all()
+	context = {
+		"all_faculty": all_staff,
+		"all_ta": all_ta
+	}
+	return render(request,"hod_template/add_course.html",context)
+
+def add_course_save(request):
+	course_id = request.POST.get("course_id")
+	course_name = request.POST.get("course_name")
+	enrolled_students = request.POST.get("enrolled_students")
+	course_instructor = request.POST.getlist("course_instructor[]")
+	involved_ta = request.POST.getlist("involved_ta[]")
+
+	admin_obj = Courses.objects.filter(course_id=course_id)
+	if admin_obj:
+		messages.error(request,"The course with entered course ID already exists.")
+		return redirect("add_course")
+	
+	ca_obj_list = []
+	for each_ca_id in course_instructor:
+		ca_obj_list.append(Staffs.objects.get(id = each_ca_id))
+
+	ta_obj_list = []
+	if involved_ta:
+		for each_ta in involved_ta:
+			ta_obj_list.append(ta.objects.get(id = each_ta))
+	
+	created_obj = Courses.objects.create(
+		course_id=course_id,
+		course_name = course_name,
+		enrolled_students=enrolled_students
+	)
+
+	created_obj.course_instructor.set(ca_obj_list)
+	if len(ta_obj_list):
+		created_obj.involved_ta.set(ta_obj_list)
+
+	messages.success(request,"Course added successfully!!")
+	return redirect("add_course")
+
+
+

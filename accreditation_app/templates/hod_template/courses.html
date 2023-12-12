@@ -1,0 +1,94 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Manage Courses
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+        <div class="container-fluid">
+
+            <a class="btn btn-primary" href="{% url 'add_course' %}" role="button">+ Add Course</a> <br/>&nbsp;
+
+
+            {% if messages %}
+                                <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                    {% if message.tags == "error" %}
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                    {% elif message.tags == "success" %}
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                </div>
+                                {% endif %}
+                                
+
+            <div class="row">
+
+                <div class="col-md-12">
+                    <!-- general form elements -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Course Details</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                <th>Course ID</th>
+                                <th>Course Name</th>
+                                <th>Number of Enrolled Students</th>
+                                <th>Course Instructors</th>
+                                <th>Course TAs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for course in all_courses %}
+                                <tr>
+                                <td>{{ course.course_id }}</td>
+                                <td>{{ course.course_name }}</td>
+                                <td>{{ course.enrolled_students }}</td>
+                                <td>
+                                    {% for all_instructor in course.course_instructor.all %}
+                                    {{ all_instructor.name}}<br>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for all_ta in course.involved_ta.all %}
+                                    {{ all_ta.name}} <br/>
+                                    {% endfor %}
+                                </td>
+                                </tr>
+                                {% endfor %}
+                                
+                            </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                        </div>
+                    <!-- /.card -->
+
+                </div>
+            </div>
+
+        </div><!-- /.container-fluid -->
+      </section>
+
+  {% endblock main_content %}
